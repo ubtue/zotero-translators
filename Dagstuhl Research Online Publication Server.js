@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2016-08-23 06:54:08"
+	"lastUpdated": "2018-03-15 10:47:22"
 }
 
 /*
@@ -36,12 +36,12 @@
 */
 
 function detectWeb(doc, url) {
-	if (url.indexOf('source_opus')>-1 || url.indexOf('volltexte')>-1) {
+	if (url.includes('source_opus')>-1 || url.includes('volltexte')>-1) {
 		var bibtexEntry = ZU.xpathText(doc, '//pre/tt');
-		if (bibtexEntry.indexOf("@InCollection")>-1) {
+		if (bibtexEntry.includes("@InCollection")>-1) {
 			return "bookSection";
 		}
-		if (bibtexEntry.indexOf("@Article")>-1) {
+		if (bibtexEntry.includes("@Article")>-1) {
 			return "journalArticle";
 		}
 		return "conferencePaper";
@@ -97,7 +97,7 @@ function scrape(doc, url) {
 		//and delete this note
 		for (var i=0; i<item.notes.length; i++) {
 			var note = item.notes[i].note;
-			if (note.indexOf('Keywords:')>-1) {
+			if (note.includes('Keywords:')>-1) {
 				note = note.replace('<p>', '').replace('</p>', '').replace('Keywords:', '');
 				var keywords = note.split(',');
 				for (var j=0; j<keywords.length; j++) {
