@@ -9,11 +9,7 @@
 	"inRepository": false,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-<<<<<<< HEAD
 	"lastUpdated": "2020-11-11 16:50:27"
-=======
-	"lastUpdated": "2020-10-26 13:42:01"
->>>>>>> 13b3adeb8d1693389161cdeb9743603f8ac18b34
 }
 
 /*
@@ -53,11 +49,7 @@ function detectWeb(doc, url) {
 function getSearchResults(doc, checkOnly) {
 	var items = {};
 	var found = false;
-<<<<<<< HEAD
 	var rows = ZU.xpath(doc, '//span[contains(@class, "art_title")]/a[contains(@href, "/doi/full/10.") or contains(@href, "/doi/abs/10.") or contains(@href, "/doi/pdf/10.")][1] | //a[contains(concat( " ", @class, " " ), concat( " ", "ref", " " )) and contains(concat( " ", @class, " " ), concat( " ", "nowrap", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "hlFld-Title", " " ))]');
-=======
-	let rows = ZU.xpath(doc, '//div[contains(@class, "art_title")]/a[contains(@href, "/doi/full/10.") or contains(@href, "/doi/abs/10.") or contains(@href, "/doi/pdf/10.")][1]');
->>>>>>> 13b3adeb8d1693389161cdeb9743603f8ac18b34
 	for (var i = 0; i < rows.length; i++) {
 		var href = rows[i].href;
 		var title = ZU.trimInternal(rows[i].textContent.replace(/Citation|ePub.*|Abstract/, ''));
@@ -182,12 +174,7 @@ function scrape(doc, url) {
 					if (tags) item.tags = tags.map(n => n.textContent);
 				}
 			}
-<<<<<<< HEAD
-			
-=======
 
-			item.notes = [];
->>>>>>> 13b3adeb8d1693389161cdeb9743603f8ac18b34
 			item.language = ZU.xpathText(doc, '//meta[@name="dc.Language"]/@content');
 			item.attachments.push({
 				url: pdfurl,
@@ -200,8 +187,6 @@ function scrape(doc, url) {
 	});
 }
 
-<<<<<<< HEAD
-=======
 /** BEGIN TEST CASES **/
 var testCases = [
 	{
@@ -402,4 +387,3 @@ var testCases = [
 	}
 ]
 /** END TEST CASES **/
->>>>>>> 13b3adeb8d1693389161cdeb9743603f8ac18b34
