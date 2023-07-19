@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2022-11-07 17:31:18"
+	"lastUpdated": "2023-07-19 14:56:04"
 }
 
 /*
@@ -140,9 +140,19 @@ function scrape(doc, url) {
 			let newAuthorSectionEntries = ZU.xpath(doc, '//span[@property="author"]');
 			for (let authorSectionEntry of newAuthorSectionEntries) {
 				if (ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]')) {
-					let orcid = ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]').replace(/https?:\/\/orcid.org\//, '');
+					var orcid = ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]').replace(/https?:\/\/orcid.org\//, '');
 					let authorName = ZU.xpathText(authorSectionEntry, './/span[@property="givenName"]') + ' ' + ZU.xpathText(authorSectionEntry, './/span[@property="familyName"]');
 					item.notes.push({"note": "orcid:" + orcid + ' | ' + authorName});
+				} else if (!orcid) {
+ 					let bottomAuthorSectionEntries = doc.querySelectorAll('#orcid');
+					for (let bottomSectionEntry of bottomAuthorSectionEntries) {
+						let entry = bottomSectionEntry.innerText;
+						let regexOrcid = /\d+-\d+-\d+-\d+x?/i;
+						let entryOrcidAuthor = entry.split('\n')[1].split('https://orcid.org/');
+							if(entryOrcidAuthor[1].match(regexOrcid)) {
+							item.notes.push({note: "orcid:" + entryOrcidAuthor[1] + ' | ' + entryOrcidAuthor[0]});
+						}
+					}	
 				}	
 			}
 			//scrape ORCID at the bottom of text and split firstName and lastName for deduplicate notes. E.g. most of cases by reviews https://journals.sagepub.com/doi/10.1177/15423050211028189
@@ -158,6 +168,11 @@ function scrape(doc, url) {
 					item.notes.push({note: "orcid:" + entryInnerText.match(regexOrcid)[0] + ' | ' + lastName + ', ' + firstName});
 				}				
 			}
+
+			//scrape ORCID at the bottom of website for review e.g. https://journals.sagepub.com/doi/10.1177/15423050211028189
+
+			
+
 			 
 			// Workaround to address address weird incorrect multiple extraction by both querySelectorAll and xpath
 			// So, let's deduplicate...
@@ -238,6 +253,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0040573620918177",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -253,9 +269,8 @@ var testCases = [
 				"DOI": "10.1177/0040573620918177",
 				"ISSN": "0040-5736",
 				"issue": "2",
-				"journalAbbreviation": "Theology Today",
 				"language": "en",
-				"libraryCatalog": "SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "210-217",
 				"publicationTitle": "Theology Today",
 				"url": "https://doi.org/10.1177/0040573620918177",
@@ -266,11 +281,7 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [
-					{
-						"tag": "Article Commentary"
-					}
-				],
+				"tags": [],
 				"notes": [
 					{
 						"note": "<p>doi: 10.1177/0040573620918177</p>"
@@ -283,6 +294,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0040573619865711",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -298,9 +310,8 @@ var testCases = [
 				"DOI": "10.1177/0040573619865711",
 				"ISSN": "0040-5736",
 				"issue": "3",
-				"journalAbbreviation": "Theology Today",
 				"language": "en",
-				"libraryCatalog": "SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "261-265",
 				"publicationTitle": "Theology Today",
 				"url": "https://doi.org/10.1177/0040573619865711",
@@ -311,11 +322,7 @@ var testCases = [
 						"mimeType": "application/pdf"
 					}
 				],
-				"tags": [
-					{
-						"tag": "Review Article"
-					}
-				],
+				"tags": [],
 				"notes": [
 					{
 						"note": "<p>doi: 10.1177/0040573619865711</p>"
@@ -328,6 +335,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0040573619826522",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -343,9 +351,8 @@ var testCases = [
 				"DOI": "10.1177/0040573619826522",
 				"ISSN": "0040-5736",
 				"issue": "1",
-				"journalAbbreviation": "Theology Today",
 				"language": "en",
-				"libraryCatalog": "SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "83-84",
 				"publicationTitle": "Theology Today",
 				"shortTitle": "The Myth of Rebellious Angels",
@@ -374,6 +381,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0969733020929062",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -395,14 +403,14 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2020-12-01",
+				"date": "December 1, 2020",
 				"DOI": "10.1177/0969733020929062",
 				"ISSN": "0969-7330",
 				"abstractNote": "Background:Ideas of patient involvement are related to notions of self-determination and autonomy, which are not always in alignment with complex interactions and communication in clinical practice.Aim:To illuminate and discuss patient involvement in routine clinical care situations in nursing practice from an ethical perspective.Method:A case study based on an anthropological field study among patients with advanced cancer in Denmark.Ethical considerations:Followed the principles of the Helsinki Declaration.Findings:Two cases illustrated situations where nurses refused patient involvement in their own case.Discussion:Focus on two ethical issues, namely ‘including patients’ experiences in palliative nursing care’ and ‘relational distribution of power and knowledge’, inspired primarily by Hannah Arendt’s concept of thoughtlessness and a Foucauldian perspective on the medical clinic and power. The article discusses how patients’ palliative care needs and preferences, knowledge and statements become part of the less significant background of nursing practice, when nurses have a predefined agenda for acting with and involvement of patients. Both structurally conditioned ‘thoughtlessness’ of the nurses and distribution of power and knowledge between patients and nurses condition nurses to set the agenda and assess when and at what level it is relevant to take up patients’ invitations to involve them in their own case.Conclusion:The medical and institutional logic of the healthcare service sets the framework for the exchange between professional and patient, which has an embedded risk that ‘thoughtlessness’ appears among nurses. The consequences of neglecting the spontaneous nature of human action and refusing the invitations of the patients to be involved in their life situation call for ethical and practical reflection among nurses. The conditions for interaction with humans as unpredictable and variable challenge nurses’ ways of being ethically attentive to ensure that patients receive good palliative care, despite the structurally conditioned logic of healthcare.",
 				"issue": "8",
 				"journalAbbreviation": "Nurs Ethics",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "1618-1630",
 				"publicationTitle": "Nursing Ethics",
 				"url": "https://doi.org/10.1177/0969733020929062",
@@ -448,6 +456,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0037768620920172",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -464,13 +473,13 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2020-09-01",
+				"date": "September 1, 2020",
 				"DOI": "10.1177/0037768620920172",
 				"ISSN": "0037-7686",
 				"abstractNote": "The sociology of religion has not systematically explored the emerging roles of religion in the whole process of the transition to adulthood, especially in the changing contexts of delayed and complicated transitions to adulthood. Seeking to bridge the two different fields of sociology, we identify four directions of research: (1) a multidimensional approach that identifies the different dimensions of religion with varying degrees of relationship to young adults’ lives; (2) a close attention to racial/ethnic variation in the roles of religion for the transition to adulthood; (3) an open inquiry into the changing importance of religion for young adults in a rapidly shifting neoliberal global economy; and (4) the detrimental effects of religion in the transition to adulthood. We call for more research on the increasingly complex relationship between religion and the transition to adulthood.",
 				"issue": "3",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "428-443",
 				"publicationTitle": "Social Compass",
 				"shortTitle": "Bridging sociology of religion to transition to adulthood",
@@ -533,6 +542,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0146107920958985",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -544,13 +554,13 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2020-11-01",
+				"date": "November 1, 2020",
 				"DOI": "10.1177/0146107920958985",
 				"ISSN": "0146-1079",
 				"abstractNote": "The Jubilee tradition commemorates the release of slaves, the remission of debt, and the repatriation of property, a “day” of physical and spiritual restoration. The Jubilee tradition—originating in a constitutional vision of ancient Israel periodically restoring its ancestral sovereignty as custodians of the land—became a master symbol of biblical theology, a powerful ideological resource as well as a promise of a divinely realized future during the Second Temple period, when the Qumran community envisioned an eschatological Jubilee and the early Jesus tradition remembered Jesus’ nonviolence in Jubilee-terms. Jubilee themes can also be identified in ideals inscribed in the founding of America, the Abolition movement, the Women’s Liberation Movement, the Civil Rights movement, and Liberation Theology. This study seeks to extend the exploration of Jubilee themes by adopting a comparative methodological approach, re-examining Jubilee themes in the context of the contemporary Palestinian-Israeli conflict, where the dream of Peace in the Middle East continues to play out in predominantly politicized contexts.",
 				"issue": "4",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "180-190",
 				"publicationTitle": "Biblical Theology Bulletin",
 				"shortTitle": "“The Land Is Mine” (Leviticus 25",
@@ -588,6 +598,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0040573620947051",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -604,13 +615,13 @@ var testCases = [
 						"creatorType": "translator"
 					}
 				],
-				"date": "2020-10-01",
+				"date": "October 1, 2020",
 				"DOI": "10.1177/0040573620947051",
 				"ISSN": "0040-5736",
 				"abstractNote": "Johann Baptist Metz died on December 2, 2019. He and Jürgen Moltmann shared a theological and personal friendship marked by affection and respect. It was an honest friendship and it lasted for over fifty years. It started when two texts met: Metz’s essay “God before Us” and Moltmann’s essay “The Category of Novum in Christian Theology.” Both were published in the volume To Honor Ernst Bloch (1965). This article is a personal reminiscence.",
 				"issue": "3",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "310-312",
 				"publicationTitle": "Theology Today",
 				"url": "https://doi.org/10.1177/0040573620947051",
@@ -650,6 +661,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/0084672420926259",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -676,13 +688,13 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2020-11-01",
+				"date": "November 1, 2020",
 				"DOI": "10.1177/0084672420926259",
 				"ISSN": "0084-6724",
 				"abstractNote": "The article concentrates on answering the main question to be addressed, as stated in its title: which psychology(ies) serves us best? In order to achieve this goal, we pursue possible answers in history of psychology of religion and its interdisciplinary relationships with its sister disciplines, anthropology of religion and religious studies, resulting with sketching a typology of the main attitudes towards conceptualising psycho-cultural interface, prevalent among psychologists: the Universalist, the Absolutist and the Relativist stances. Next chosen examples from the field of applied psychology are presented, as the role of the cultural factor within the history of Diagnostic and Statistical Manual of Mental Disorders’ (DSM) development is discussed alongside presenting research on the phenomenon of ‘hearing voices’, in order to show the marked way for the future – the importance of including the cultural factor in psychological research on religion.",
 				"issue": "3",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "295-316",
 				"publicationTitle": "Archive for the Psychology of Religion",
 				"shortTitle": "Which psychology(ies) serves us best?",
@@ -732,6 +744,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/10.1177/15423050211028189",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -743,13 +756,13 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2021-09-01",
+				"date": "September 1, 2021",
 				"DOI": "10.1177/15423050211028189",
 				"ISSN": "1542-3050",
 				"issue": "3",
 				"journalAbbreviation": "J Pastoral Care Counsel",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "229-230",
 				"publicationTitle": "Journal of Pastoral Care & Counseling",
 				"shortTitle": "Mitchell, Kenneth R., All Our Losses, All Our Griefs",
@@ -769,6 +782,9 @@ var testCases = [
 				"notes": [
 					{
 						"note": "<p>doi: 10.1177/15423050211028189</p>"
+					},
+					{
+						"note": "orcid:0000-0002-5423-3796 | Emi Alisa Johnson Brand "
 					}
 				],
 				"seeAlso": []
@@ -778,6 +794,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://journals.sagepub.com/doi/full/10.1177/09518207221115929",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -794,12 +811,13 @@ var testCases = [
 						"creatorType": "author"
 					}
 				],
-				"date": "2022-09-01",
+				"date": "September 1, 2022",
 				"DOI": "10.1177/09518207221115929",
 				"ISSN": "0951-8207",
+				"abstractNote": "The Animal Apocalypse (1 En. 85–90) provides some of the most vivid imagery in Second Temple literature. In reference to the descent of the Watchers allegorized as stars, the narrative invokes the simile “they let out their phalluses like stallions” three times. Beyond the simile’s allusion to the oracle in Ezek 23:20, the stallion phallus remains largely unexplored. Our investigation demonstrates the associations of stallions with “aggressive virility” and foreignness based on the Hebrew Bible and contemporary Hellenistic and early Jewish literature. Moreover, we show the Animal Apocalypse’s innovative emphasis on the violent nature of the sexual acts, a feature absent in Gen 6 and the Book of Watchers, and argue for the episode’s contextualization with other early Jewish texts in which sexual violence is present. By spotlighting the stallion-phallused stars with their foreign genitalia, the Animal Apocalypse highlights anxieties surrounding communal boundary crossing and its violent repercussions.",
 				"issue": "1",
 				"language": "en",
-				"libraryCatalog": "utbue_SAGE Journals",
+				"libraryCatalog": "ubtue_SAGE Journals",
 				"pages": "57-74",
 				"publicationTitle": "Journal for the Study of the Pseudepigrapha",
 				"shortTitle": "The phallus in our stars",
@@ -840,6 +858,56 @@ var testCases = [
 					},
 					{
 						"note": "LF:"
+					}
+				],
+				"seeAlso": []
+			}
+		]
+	},
+	{
+		"type": "web",
+		"url": "https://journals.sagepub.com/doi/10.1177/15423050211028189",
+		"detectedItemType": "journalArticle",
+		"items": [
+			{
+				"itemType": "journalArticle",
+				"title": "Mitchell, Kenneth R., All Our Losses, All Our Griefs: Resources for Pastoral Care",
+				"creators": [
+					{
+						"lastName": "Johnson Brand",
+						"firstName": "Emi Alisa",
+						"creatorType": "author"
+					}
+				],
+				"date": "September 1, 2021",
+				"DOI": "10.1177/15423050211028189",
+				"ISSN": "1542-3050",
+				"issue": "3",
+				"journalAbbreviation": "J Pastoral Care Counsel",
+				"language": "en",
+				"libraryCatalog": "ubtue_SAGE Journals",
+				"pages": "229-230",
+				"publicationTitle": "Journal of Pastoral Care & Counseling",
+				"shortTitle": "Mitchell, Kenneth R., All Our Losses, All Our Griefs",
+				"url": "https://doi.org/10.1177/15423050211028189",
+				"volume": "75",
+				"attachments": [
+					{
+						"title": "SAGE PDF Full Text",
+						"mimeType": "application/pdf"
+					}
+				],
+				"tags": [
+					{
+						"tag": "Book Review"
+					}
+				],
+				"notes": [
+					{
+						"note": "<p>doi: 10.1177/15423050211028189</p>"
+					},
+					{
+						"note": "orcid:0000-0002-5423-3796 | Emi Alisa Johnson Brand "
 					}
 				],
 				"seeAlso": []
