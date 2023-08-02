@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2023-07-19 14:56:04"
+	"lastUpdated": "2023-08-02 14:54:15"
 }
 
 /*
@@ -139,21 +139,18 @@ function scrape(doc, url) {
 			//scrape ORCID from website e.g. https://doi.org/10.1177/09518207221115929
 			let newAuthorSectionEntries = ZU.xpath(doc, '//span[@property="author"]');
 			for (let authorSectionEntry of newAuthorSectionEntries) {
+				var orcid, authorName;
 				if (ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]')) {
-					var orcid = ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]').replace(/https?:\/\/orcid.org\//, '');
-					let authorName = ZU.xpathText(authorSectionEntry, './/span[@property="givenName"]') + ' ' + ZU.xpathText(authorSectionEntry, './/span[@property="familyName"]');
-					item.notes.push({"note": "orcid:" + orcid + ' | ' + authorName});
-				} else if (!orcid) {
- 					let bottomAuthorSectionEntries = doc.querySelectorAll('#orcid');
-					for (let bottomSectionEntry of bottomAuthorSectionEntries) {
-						let entry = bottomSectionEntry.innerText;
-						let regexOrcid = /\d+-\d+-\d+-\d+x?/i;
-						let entryOrcidAuthor = entry.split('\n')[1].split('https://orcid.org/');
-							if(entryOrcidAuthor[1].match(regexOrcid)) {
-							item.notes.push({note: "orcid:" + entryOrcidAuthor[1] + ' | ' + entryOrcidAuthor[0]});
+					orcid = ZU.xpathText(authorSectionEntry, './a[contains(@href, "orcid")]').replace(/https?:\/\/orcid.org\//, '');Z.debug(orcid)
+					authorName = ZU.xpathText(authorSectionEntry, './/span[@property="givenName"]') + ' ' + ZU.xpathText(authorSectionEntry, './/span[@property="familyName"]');Z.debug(authorName)
+					} else if (!orcid) {
+						let bottomAuthorSectionEntries = doc.querySelectorAll('section#orcid');
+						for (let bottomSectionEntry of bottomAuthorSectionEntries) {
+							orcid = bottomSectionEntry.innerText.match(/\d+-\d+-\d+-\d+x?/i);
+							authorName = bottomSectionEntry.innerText.split('\n')[1].split('https://orcid.org/')[0];
 						}
-					}	
-				}	
+					}
+				if (Boolean(orcid) && Boolean(authorName)) item.notes.push({"note": "orcid:" + orcid + ' | ' + authorName});
 			}
 			//scrape ORCID at the bottom of text and split firstName and lastName for deduplicate notes. E.g. most of cases by reviews https://journals.sagepub.com/doi/10.1177/15423050211028189
 			let ReviewAuthorSectionEntries = doc.querySelectorAll('.NLM_fn p');
@@ -162,21 +159,18 @@ function scrape(doc, url) {
 				let regexOrcid = /\d+-\d+-\d+-\d+x?/i;
 				if(entryInnerText.match(regexOrcid) && entryInnerText.split('\n')[1] != undefined) {
 					let authorEntry = entryInnerText.split('\n')[1].replace(/https:\/\/.*/, '');
-					let fullName = entryInnerText.match(authorEntry)[0].replace('\"', '').trim();Z.debug(fullName)
+					let fullName = entryInnerText.match(authorEntry)[0].replace('\"', '').trim();
 					let	firstName = fullName.split(' ').slice(0, -1).join(' ');
 					let	lastName = fullName.split(' ').slice(-1).join(' ');
 					item.notes.push({note: "orcid:" + entryInnerText.match(regexOrcid)[0] + ' | ' + lastName + ', ' + firstName});
 				}				
 			}
-
-			//scrape ORCID at the bottom of website for review e.g. https://journals.sagepub.com/doi/10.1177/15423050211028189
-
 			
-
-			 
+			//scrape ORCID at the bottom of website for review e.g. https://journals.sagepub.com/doi/10.1177/15423050211028189
 			// Workaround to address address weird incorrect multiple extraction by both querySelectorAll and xpath
 			// So, let's deduplicate...
 			item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
+
 			let absNr = 0;
 			
 			for (let abstract of ZU.xpath(doc, '//section[contains(@id,"abstract") and not(contains(@id,"abstracts"))]')) {
@@ -858,56 +852,6 @@ var testCases = [
 					},
 					{
 						"note": "LF:"
-					}
-				],
-				"seeAlso": []
-			}
-		]
-	},
-	{
-		"type": "web",
-		"url": "https://journals.sagepub.com/doi/10.1177/15423050211028189",
-		"detectedItemType": "journalArticle",
-		"items": [
-			{
-				"itemType": "journalArticle",
-				"title": "Mitchell, Kenneth R., All Our Losses, All Our Griefs: Resources for Pastoral Care",
-				"creators": [
-					{
-						"lastName": "Johnson Brand",
-						"firstName": "Emi Alisa",
-						"creatorType": "author"
-					}
-				],
-				"date": "September 1, 2021",
-				"DOI": "10.1177/15423050211028189",
-				"ISSN": "1542-3050",
-				"issue": "3",
-				"journalAbbreviation": "J Pastoral Care Counsel",
-				"language": "en",
-				"libraryCatalog": "ubtue_SAGE Journals",
-				"pages": "229-230",
-				"publicationTitle": "Journal of Pastoral Care & Counseling",
-				"shortTitle": "Mitchell, Kenneth R., All Our Losses, All Our Griefs",
-				"url": "https://doi.org/10.1177/15423050211028189",
-				"volume": "75",
-				"attachments": [
-					{
-						"title": "SAGE PDF Full Text",
-						"mimeType": "application/pdf"
-					}
-				],
-				"tags": [
-					{
-						"tag": "Book Review"
-					}
-				],
-				"notes": [
-					{
-						"note": "<p>doi: 10.1177/15423050211028189</p>"
-					},
-					{
-						"note": "orcid:0000-0002-5423-3796 | Emi Alisa Johnson Brand "
 					}
 				],
 				"seeAlso": []
