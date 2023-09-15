@@ -8,8 +8,8 @@
 	"priority": 99,
 	"inRepository": true,
 	"translatorType": 4,
-	"browserSupport": "gcsbv",
-	"lastUpdated": "2021-10-19 08:34:52"
+	"browserSupport": "gcsibv",
+	"lastUpdated": "2023-09-15 08:26:22"
 }
 
 /*
@@ -151,7 +151,7 @@ function complementItem(doc, item) {
 		if (!item.journalAbbreviation || item.publicationTitle == item.journalAbbreviation) {
 			item.journalAbbreviation = ZU.xpathText(doc, '//meta[@name="citation_journal_abbrev"]/@content');
 		}
-		let oa_desc = ZU.xpathText(doc, '//span[@data-test="open-access"]');
+		let oa_desc = ZU.xpathText(doc, '//span[@data-test="open-access"]') ? ZU.xpathText(doc, '//span[@data-test="open-access"]') : ZU.xpathText(doc, '//a[@class="u-color-open-access"]');
 		if (oa_desc && oa_desc.match(/open access/i))
 			item.notes.push({note: 'LF:'});
 	}
@@ -251,7 +251,7 @@ function complementItem(doc, item) {
 function getORCID(doc, item) {
 	let authorOrcidEntries = ZU.xpath(doc, '//*[@class="c-article-author-list__item"]');
 	for (let authorOrcidEntry of authorOrcidEntries) {
-		let authorEntry = authorOrcidEntry.innerText.split('\n')[0];
+		let authorEntry = authorOrcidEntry.textContent.split('\n')[0];
 		let orcidEntry = authorOrcidEntry.innerHTML;
 		if (authorEntry && orcidEntry && orcidEntry.match(/\d+-\d+-\d+-\d+x?/i)) {
 			let author = ZU.trimInternal(authorEntry.replace(/&/g, ''));
@@ -663,6 +663,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://link.springer.com/article/10.1007/s11089-020-00907-4",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -734,6 +735,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://link.springer.com/article/10.1007/s40839-019-00082-6",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -772,6 +774,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://link.springer.com/article/10.1007/s40839-019-00082-6",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -810,6 +813,7 @@ var testCases = [
 	{
 		"type": "web",
 		"url": "https://link.springer.com/article/10.1007/s10943-021-01246-1",
+		"detectedItemType": "journalArticle",
 		"items": [
 			{
 				"itemType": "journalArticle",
@@ -875,7 +879,7 @@ var testCases = [
 						"note": "LF:"
 					},
 					{
-						"note": "orcid:0000-0003-1473-2483 | Benita Spronk, | taken from website"
+						"note": "orcid:0000-0003-1473-2483 | Benita Spronk | taken from website"
 					},
 					{
 						"note": "orcid:0000-0001-7620-6812 | Guy Widdershoven | taken from website"
@@ -892,6 +896,77 @@ var testCases = [
 		"type": "web",
 		"url": "https://link.springer.com/journal/10943/volumes-and-issues/60-5",
 		"items": "multiple"
+	},
+	{
+		"type": "web",
+		"url": "https://link.springer.com/article/10.1007/s11153-023-09868-z",
+		"detectedItemType": "journalArticle",
+		"items": [
+			{
+				"itemType": "journalArticle",
+				"title": "Moral knowledge and the existence of god",
+				"creators": [
+					{
+						"lastName": "McKay",
+						"firstName": "Noah D.",
+						"creatorType": "author"
+					}
+				],
+				"date": "2023-08-01",
+				"DOI": "10.1007/s11153-023-09868-z",
+				"ISSN": "1572-8684",
+				"abstractNote": "In this essay, I argue that, all else being equal, theism is more probable than naturalism on the assumption that human beings are able to arrive at a body of moral knowledge that is largely accurate and complete. I put forth this thesis on grounds that, if naturalism is true, the explanation of the content of our moral intuitions terminates either in biological-evolutionary processes or in social conventions adopted for pragmatic reasons; that, if this is so, our moral intuitions were selected for their utility, not their truth; and that, if our moral intuitions were so selected, they are probably false. I defend the argument against three objections: first, that the argument amounts to a generic skeptical challenge; second, that ethical naturalism explains how our moral intuitions could have been selected for their truth; and third, that there is a pre-established harmony between the utility of moral beliefs and their truth-values.",
+				"issue": "1",
+				"journalAbbreviation": "Int J Philos Relig",
+				"language": "en",
+				"libraryCatalog": "ubtue_Springer Link",
+				"pages": "25-42",
+				"publicationTitle": "International Journal for Philosophy of Religion",
+				"url": "https://doi.org/10.1007/s11153-023-09868-z",
+				"volume": "94",
+				"attachments": [
+					{
+						"title": "Springer Full Text PDF",
+						"mimeType": "application/pdf"
+					}
+				],
+				"tags": [
+					{
+						"tag": "Ethics"
+					},
+					{
+						"tag": "Evolutionary debunking arguments"
+					},
+					{
+						"tag": "Metaethics"
+					},
+					{
+						"tag": "Moral realism"
+					},
+					{
+						"tag": "Moral skepticism"
+					},
+					{
+						"tag": "Natural theology"
+					},
+					{
+						"tag": "Theism"
+					},
+					{
+						"tag": "Theistic arguments"
+					}
+				],
+				"notes": [
+					{
+						"note": "LF:"
+					},
+					{
+						"note": "orcid:0000-0001-6642-1631 | Noah D. McKay | taken from website"
+					}
+				],
+				"seeAlso": []
+			}
+		]
 	}
 ]
 /** END TEST CASES **/
