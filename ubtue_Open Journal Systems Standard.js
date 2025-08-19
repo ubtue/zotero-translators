@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-07-24 07:49:44"
+	"lastUpdated": "2025-08-18 12:43:24"
 }
 
 /*
@@ -227,9 +227,9 @@ function joinTitleAndSubtitle (doc, item) {
 	}
 
 	if (item.ISSN == '2961-6492') {
-        let subtitle = ZU.xpathText(doc, '//h1[@class="page_title"]//following-sibling::h2[@class="subtitle"]')?.trim();
+		let subtitle = ZU.xpathText(doc, '//h1[@class="page_title"]//following-sibling::h2[@class="subtitle"]')?.trim();
 		if (subtitle) {
-		    item.title = item.title + (item.title.slice(-1) == ':' ? '' : ': ') + subtitle;
+			item.title = item.title + (item.title.slice(-1) == ':' ? '' : ': ') + subtitle;
 		}
 	}
 
@@ -280,6 +280,8 @@ function invokeUbtuePKPTranslator(doc) {
 				if (abs.textContent.length)
 					i.notes.push('abs:' + ZU.trimInternal(abs.textContent));
 			}
+			if (i.ISSN == "1126-8557" && !i.abstractNote)
+				i.abstractNote = ZU.trimInternal(abs.textContent).replace('&nbsp;','');
 		}
 
 		// Fix/remove erroneous abstracts
@@ -325,6 +327,15 @@ function invokeUbtuePKPTranslator(doc) {
 						i.volume = itemVolume[1];
 					}
 				} else i.volume = '';
+			}
+			var citationPdfUrlMeta = doc.querySelector('meta[name="citation_pdf_url"]');
+			if (!citationPdfUrlMeta) {
+				if (!i.notes) {
+					i.notes = [];
+				}
+				if (!i.notes.some(note => note.note && note.note.includes("no_pdf:Artikelseite enthält keinen Volltext"))) {
+					i.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
+				}
 			}
 		}
 

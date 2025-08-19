@@ -6,10 +6,10 @@
 	"minVersion": "3.0",
 	"maxVersion": "",
 	"priority": 100,
-	"inRepository": false,
+	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2023-05-24 13:34:59"
+	"lastUpdated": "2025-08-19 06:25:14"
 }
 
 /*
@@ -91,13 +91,15 @@ function invokeEMTranslator(doc, url) {
 		}
 		if (i.reportType === "book-review") i.tags.push('Book review') && delete i.abstractNote;	
 		let pagesEntry = text(doc, '.publicationContentPages');
-		if (pagesEntry.match(/\s\d+\w?-\d+/) != null) i.pages = pagesEntry.match(/\s\d+\w?-\d+/)[0];
+		if(pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/) != null)
+    		i.pages = pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/)[0];
 		let volumes = text(doc, '.breadcrumbs');
-		if (volumes) i.volume = volumes.match(/Volume\s?\d+/)[0].replace('Volume', '');
+		i.volume = volumes?.match(/Volume\s?\d+/)?.[0]?.replace('Volume', '').trim() ?? null;
+		if (i.ISSN='2507-0290' && !i.volume) i.volume = volumes?.match(/Volume\s?\w+/)?.[0]?.replace('Volume', '').trim() ?? null;
 		let issue = text(doc, '.breadcrumbs');
 		let issueError = issue.toString();
 		i.archive = i.issue;
-		if (issueError) i.issue = issueError.split('>')[3].split('Issue')[1];
+		if (issueError) i.issue = issueError.split('>')[3].split('Issue')[1]?.replace(/[-.]/, "/");
 		let year = attr(doc, 'ul.breadcrumbs li:nth-child(4) a', 'href');
 		if (year && year.match(/\w+\/\d+/)) i.date = year.split('/')[3];
 		let issn = text(doc, '.serialDetailsEissn');
@@ -112,8 +114,6 @@ function invokeEMTranslator(doc, url) {
 	});
 	translator.translate();
 }
-
-
 
 /** BEGIN TEST CASES **/
 var testCases = [

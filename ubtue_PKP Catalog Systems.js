@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2024-05-16 07:52:02"
+	"lastUpdated": "2025-08-18 12:43:12"
 }
 
 /*
@@ -100,6 +100,42 @@ function doWeb(doc, url) {
 	}
 }
 
+function normalizeWhitespace(str) {
+	return str
+		.replace(/&nbsp;/g, '')
+		.replace(/\s+/g, '')
+		.replace(/\u00A0/g, '')
+		.trim();
+}
+
+function cleanAuthorName(creator) {
+	let fullName = "";
+
+	if (creator.firstName) {
+		fullName += creator.firstName;
+	}
+	if (creator.lastName) {
+		if (fullName) fullName += ", ";
+		fullName += creator.lastName;
+	}
+
+	fullName = fullName.replace(/\b(L\.?,?\s*C\.?|Msc)\b/gi, '').trim();
+	fullName = fullName.replace(/^\s*,\s*/, '').replace(/\s*,\s*$/, '').replace(/\s{2,}/g, ' ');
+	if (!fullName) return null;
+
+	return ZU.cleanAuthor(fullName, "author");
+}
+
+function cleanAbstractNote(text) {
+	if (!text) return '';
+
+	text = text.replace(/^(Summary\.?|Sommario|Summero|Sumario|Sumário|:)\s*:?\s*/i, '');
+	text = text.replace(/(?:^|\n)(Key words?|Keywords?):.*(\n|$)/i, '\n');
+	text = text.replace(/(?:^|\n)(Parole chiave|Palabras clave|Palavras-chave|Palavra-chave):.*(\n|$)/i, '\n');
+
+	return text.replace(/&nbsp;/g, ' ').trim();
+}
+
 function scrape(doc, url) {
 	// use Embeded Metadata
 	var trans = Zotero.loadTranslator('web');
@@ -115,7 +151,6 @@ function scrape(doc, url) {
 		if (!item.title) {
 			item.title = text(doc, '#articleTitle');
 		}
-
 		if (item.creators.length == 0) {
 			var authorString = doc.getElementById("authorString");
 			if (authorString) {
@@ -160,8 +195,9 @@ function scrape(doc, url) {
 			item.abstractNote = attr(doc, 'meta[name="DC.Description"]', 'content');
 		}
 
-		if (!item.ISBN) {
-			item.ISBN = ZU.cleanISBN(text(doc, '.identification_code .value'));
+		var isbnVal = text(doc, '.identification_code .value');
+		if (!item.ISBN && isbnVal) {
+			item.ISBN = ZU.cleanISBN(isbnVal);
 		}
 
 		if (item.date) {
@@ -181,6 +217,10 @@ function scrape(doc, url) {
 		if (item.institution) {
 			item.institution = '';
 		}
+
+		let firstPage = ZU.xpathText(doc, '//meta[@name="citation_firstpage"]/@content');
+		let lastPage = ZU.xpathText(doc, '//meta[@name="citation_lastpage"]/@content');
+		if (firstPage && firstPage == lastPage) item.pages = firstPage;
 
 		var pdfAttachment = false;
 
@@ -221,9 +261,74 @@ function scrape(doc, url) {
 			}
 		}
 
-        let article_type = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content')
-        if (article_type.match(/(Recensioni)|(Recensiones)/))
-            item.tags.push("Book Review");
+		if (item.ISSN=='1126-8557') {
+			var citationPdfUrlMeta = doc.querySelector('meta[name="citation_pdf_url"]');
+			if (!citationPdfUrlMeta) {
+				if (!item.notes) {
+					item.notes = [];
+				}
+				if (!item.notes.some(note => note.note && note.note.includes("no_pdf:Artikelseite enthält keinen Volltext"))) {
+					item.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
+				}
+			}
+			if (item.abstractNote) {
+				const normalizedAbstract = normalizeWhitespace(item.abstractNote);
+				if (normalizedAbstract == normalizeWhitespace(item.title) ||
+					normalizedAbstract === '-' || normalizedAbstract === '*' || normalizedAbstract == ':') {
+					item.abstractNote = '';
+				}
+			}
+				
+			item.creators = item.creators
+				.map(cleanAuthorName)
+				.filter(creator => creator !== null && (creator.firstName || creator.lastName));
+		}
+
+		if (item.ISSN=='2296-469X') {
+			var labels = doc.querySelectorAll('h2.label');
+			var issueText = "";
+			for (let label of labels) {
+				const labelText = label.textContent.trim();
+				if (labelText === "Issue" || labelText === "Ausgabe") {
+					let valueDiv = label.nextElementSibling;
+					if (valueDiv && valueDiv.classList.contains("value")) {
+						let issueAnchor = valueDiv.querySelector('a.title');
+						if (issueAnchor) {
+							issueText = issueAnchor.textContent.trim();
+						} else {
+							issueText = valueDiv.textContent.trim();
+						}
+						break;
+					}
+				}
+			}
+			let issueMatch = issueText.match(/^(\d+)(?:\/([\d\-]+))? \(([\d\/]+)\)$/);
+			if (issueMatch) {
+				item.volume = issueMatch[1];
+				item.issue = issueMatch[2]?.replace("-", "/");
+				item.date = issueMatch[3];
+			}
+			let articleType = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content');
+			if (articleType == 'Bibliographie') 
+				item.tags.push("Bibliografie")
+			else if (articleType == 'Nachruf')
+				item.tags.push("Nachruf")
+		}
+
+		if (item.ISSN == '2304-8557') {
+			articleID = doc.querySelector('meta[name="DC.Identifier"]').content;
+			item.notes.push('elocationid:'+ articleID)
+
+			if (item.pages.includes('page')) item.pages = ''
+		}
+
+		if (item.issue) {
+			item.issue = item.issue.replace("-", "/");
+		}
+
+		let article_type = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content')
+		if (article_type.match(/(Recensioni)|(Recensiones)|(Buchbesprechungen)/))
+			item.tags.push("Book Review");
 
 		item.complete();
 	});
@@ -233,7 +338,6 @@ function scrape(doc, url) {
 		trans.doWeb(doc, url);
 	});
 }
-
 
 /** BEGIN TEST CASES **/
 var testCases = [
