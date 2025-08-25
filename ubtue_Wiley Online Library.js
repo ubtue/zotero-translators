@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-25 08:42:35"
+	"lastUpdated": "2025-08-25 12:08:15"
 }
 
 /*
@@ -70,6 +70,10 @@ function addBookReviewTag(doc, item) {
 	if (primaryHeading.match(/Book Review\b|Review Essays?|Reviews?\b|Book Discussion\b|Criticism of Current Literature/i)) {
 		item.tags.push('Book Review');
 	}
+}
+
+function sentenceCase(str) {
+  return str.toLowerCase().replace(/(^\w|[.!?]\s*\w)/g, c => c.toUpperCase());
 }
 
 function addPages (doc, item) {
@@ -391,6 +395,7 @@ function scrapeBibTeX(doc, url) {
 					item.creators.push(ZU.cleanAuthor(getAuthorName(author), 'author', false));
 				}
 			}
+
 			// Make sure we pass only the DOI not the whole URL
 			doiURLRegex = /^https:\/\/doi.org\/(.*)/;
 			if (item.DOI && item.DOI.match(doiURLRegex))
@@ -401,6 +406,18 @@ function scrapeBibTeX(doc, url) {
 			// Workaround for erroneous Bibtex and RIS information for reviews
 			handleErroneousReviewTitles(doc, item);
 			normalizeTitle(item);
+
+			if (item.ISSN == "1540-6385" && item.title) {
+				let title = item.title;
+				let match = title.match(/^([A-Z\s-]+?\.)/);
+				if (match) {
+					let allCapsPart = match[1].trimStart();
+					let fixedPart = sentenceCase(allCapsPart);
+					title = fixedPart + title.substring(allCapsPart.length + 1);
+				}
+				item.title = title;
+			}
+
 			item.complete();
 		});
 
