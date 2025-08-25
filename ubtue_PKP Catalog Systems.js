@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-25 12:45:53"
+	"lastUpdated": "2025-08-25 13:19:17"
 }
 
 /*
@@ -259,6 +259,11 @@ function scrape(doc, url) {
 					break;
 				}
 			}
+		}
+
+		if (item.ISSN == '2317-4307') {
+			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
+			if (articleTypePath && articleTypePath.textContent.trim()=='Resenha') item.tags.push("Book Review")
 		}
 
 		if (item.ISSN=='1126-8557') {
