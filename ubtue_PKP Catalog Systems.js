@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-18 12:43:12"
+	"lastUpdated": "2025-08-19 14:12:46"
 }
 
 /*
@@ -327,7 +327,7 @@ function scrape(doc, url) {
 		}
 
 		let article_type = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content')
-		if (article_type.match(/(Recensioni)|(Recensiones)|(Buchbesprechungen)/))
+		if (article_type && article_type.match(/(Recensioni)|(Recensiones)|(Buchbesprechungen)/))
 			item.tags.push("Book Review");
 
 		item.complete();

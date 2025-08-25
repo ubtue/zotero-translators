@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-01-08 11:41:14"
+	"lastUpdated": "2025-08-25 08:42:35"
 }
 
 /*
@@ -67,7 +67,7 @@ function getAuthorName(text) {
 
 function addBookReviewTag(doc, item) {
 	var primaryHeading = ZU.xpathText(doc, '//span[@class="primary-heading"]');
-	if (primaryHeading.match(/Book Review\b|Review Essays?|Reviews?\b|Book Discussion\b/i)) {
+	if (primaryHeading.match(/Book Review\b|Review Essays?|Reviews?\b|Book Discussion\b|Criticism of Current Literature/i)) {
 		item.tags.push('Book Review');
 	}
 }
