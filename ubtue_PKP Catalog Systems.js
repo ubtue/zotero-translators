@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-25 13:19:17"
+	"lastUpdated": "2025-08-25 14:10:22"
 }
 
 /*
@@ -261,9 +261,17 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (item.ISSN == '2317-4307') {
+		if (item.ISSN == '2317-4307' || item.ISSN == '1980-6736') {
+			const reviewTypes = ['Resenha', 'Review', 'Reseñas', 'Recensões e Resenhas'];
 			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
-			if (articleTypePath && articleTypePath.textContent.trim()=='Resenha') item.tags.push("Book Review")
+			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
+				item.tags.push("Book Review")
+			if (item.abstractNote && item.abstractNote == "---") item.abstractNote = ''
+			for (let i = item.tags.length - 1; i >= 0; i--) {
+				if (item.tags[i] === "---") {
+					item.tags.splice(i, 1);
+				}
+			}
 		}
 
 		if (item.ISSN=='1126-8557') {
