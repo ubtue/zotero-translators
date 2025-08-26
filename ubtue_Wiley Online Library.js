@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-25 12:08:15"
+	"lastUpdated": "2025-08-26 11:57:27"
 }
 
 /*
@@ -408,14 +408,7 @@ function scrapeBibTeX(doc, url) {
 			normalizeTitle(item);
 
 			if (item.ISSN == "1540-6385" && item.title) {
-				let title = item.title;
-				let match = title.match(/^([A-Z\s-]+?\.)/);
-				if (match) {
-					let allCapsPart = match[1].trimStart();
-					let fixedPart = sentenceCase(allCapsPart);
-					title = fixedPart + title.substring(allCapsPart.length + 1);
-				}
-				item.title = title;
+				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			}
 
 			item.complete();

@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-26 07:41:03"
+	"lastUpdated": "2025-08-26 12:44:18"
 }
 
 /*
@@ -319,7 +319,14 @@ function scrape(doc, url) {
 			if (issueMatch) {
 				item.volume = issueMatch[1];
 				item.issue = issueMatch[2]?.replace("-", "/");
-				item.date = issueMatch[3];
+				let dateStr = issueMatch[3];
+
+				let years = dateStr.split('/');
+				if (years.length === 2 && /^\d{4}$/.test(years[0]) && /^\d{4}$/.test(years[1])) {
+					item.date = years[1];
+				} else {
+					item.date = dateStr;
+				}
 			}
 			let articleType = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content');
 			if (articleType == 'Bibliographie') 
