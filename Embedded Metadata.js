@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2024-03-11 11:45:12"
+	"lastUpdated": "2024-08-15 14:14:10"
 }
 
 /*
@@ -407,20 +407,18 @@ function addHighwireMetadata(doc, newItem, hwType) {
 		var authors = authorNodes[i].nodeValue.split(/\s*;\s*/);
 		if (authors.length == 1 && authorNodes.length == 1) {
 			var authorsByComma = authors[0].split(/\s*,\s*/);
-
+			
 			/* If there is only one author node and
 			we get nothing when splitting by semicolon, and at least two words on
-			either side of the comma when splitting by comma, we split by comma.
-			unless we have some special case*/
-
+			either side of the comma when splitting by comma, we split by comma. */
+			
 			LAST_NAME_PREFIX = /^(van|de|von)/i;
 			if (authorsByComma.length > 1
 				&& authorsByComma[0].includes(" ")
 				&& authorsByComma[1].includes(" ")
 				&& !LAST_NAME_PREFIX.test(authorsByComma[0]))
-				authors = authorsByComma;
+			    authors = authorsByComma;
 		}
-
 		for (var j = 0, m = authors.length; j < m; j++) {
 			var author = authors[j].trim();
 
@@ -470,8 +468,7 @@ function addHighwireMetadata(doc, newItem, hwType) {
 
 	// Deal with tags in a string
 	// we might want to look at the citation_keyword metatag later
-	if (!newItem.tags || !newItem.tags.length || newItem.tags.length == 1 /* e.g. for Journal of Deradicalization */) {
-        var old_tag = newItem.tags;
+	if (!newItem.tags || !newItem.tags.length) {
 		var tags = getContent(doc, 'citation_keywords');
 		newItem.tags = [];
 		for (let i = 0; i < tags.length; i++) {
@@ -484,9 +481,6 @@ function addHighwireMetadata(doc, newItem, hwType) {
 				}
 			}
 		}
-        if (newItem.tags.length <= 1 && old_tag)
-            newItem.tags = old_tag;
-
 	}
 
 	// sometimes RDF has more info, let's not drop it
@@ -503,18 +497,18 @@ function addHighwireMetadata(doc, newItem, hwType) {
 		newItem.pages = firstpage
 			+ ((lastpage && (lastpage = lastpage.trim())) ? '-' + lastpage : '');
 	}
-
+	
 	// swap in hwType for itemType
 	if (hwType && hwType != newItem.itemType) {
 		newItem.itemType = hwType;
 	}
-
-
+	
+	
 	// fall back to some other date options
 	if (!newItem.date) {
 		var onlineDate = getContentText(doc, 'citation_online_date');
 		var citationYear = getContentText(doc, 'citation_year');
-
+		
 		if (onlineDate && citationYear) {
 			onlineDate = ZU.strToISO(onlineDate);
 			if (citationYear < onlineDate.substr(0, 4)) {
@@ -672,7 +666,7 @@ function addLowQualityMetadata(doc, newItem) {
 	if (!newItem.url) {
 		newItem.url = ZU.xpathText(doc, '//head/link[@rel="canonical"]/@href') || doc.location.href;
 	}
-
+	
 	if (!newItem.language) {
 		newItem.language = ZU.xpathText(doc, '//x:meta[@name="language"]/@content', namespaces)
 			|| ZU.xpathText(doc, '//x:meta[@name="lang"]/@content', namespaces)
@@ -911,6 +905,7 @@ var exports = {
 	splitTags: true,
 	fixSchemaURI: setPrefixRemap
 };
+
 
 /** BEGIN TEST CASES **/
 var testCases = [
