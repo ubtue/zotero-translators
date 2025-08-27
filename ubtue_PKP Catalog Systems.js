@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-26 12:44:18"
+	"lastUpdated": "2025-08-27 07:12:15"
 }
 
 /*
@@ -134,6 +134,10 @@ function cleanAbstractNote(text) {
 	text = text.replace(/(?:^|\n)(Parole chiave|Palabras clave|Palavras-chave|Palavra-chave):.*(\n|$)/i, '\n');
 
 	return text.replace(/&nbsp;/g, ' ').trim();
+}
+
+function sentenceCase(str) {
+  return str.toLowerCase().replace(/(^\w|[.!?]\s*\w)/g, c => c.toUpperCase());
 }
 
 function scrape(doc, url) {
@@ -261,8 +265,8 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (item.ISSN == '2317-4307' || item.ISSN == '1980-6736') {
-			const reviewTypes = ['Resenha', 'Review', 'Reseñas', 'Recensões e Resenhas'];
+		if (['2317-4307', '1980-6736', '2237-6461'].includes(item.ISSN)) {
+			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas'];
 			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
 			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
 				item.tags.push("Book Review")
@@ -342,6 +346,10 @@ function scrape(doc, url) {
 
 			if (item.pages && item.pages.includes('page')) item.pages = ''
 		}
+
+		if (item.ISSN == "2237-6461" && item.title) {
+				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
+			}
 
 		if (item.issue) {
 			item.issue = item.issue.replace("-", "/");
