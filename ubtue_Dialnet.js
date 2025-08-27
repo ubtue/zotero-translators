@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-12 07:40:15"
+	"lastUpdated": "2025-08-27 11:26:53"
 }
 
 /*
@@ -122,44 +122,26 @@ function scrape(doc, url) {
 			}
 		}
 		// in case of double issue e.g. "3-4" wrong issue number in Embedded Metadata e,g. "3" 
-		// clean issue number in case of multiple download
-		var issue = ZU.xpathText(doc, '//*[@id="informacion"]//a[contains(text(), "Nº.")]');
+		var issue = ZU.xpathText(doc, '//*[@id="informacion"]//a[contains(text(), "Nº")]');
 		if (issue) {
-			// e.g. Vol. 89, Nº. 3-4, 2012 or  Vol. 65, Nº. 1-2 (Enero-Junio)
-			var issueEntry = issue.split('Nº.')[1].split(',')[0].trim();
-			if (issueEntry) item.issue = issueEntry.split('\(')[0].trim();
+			var issueEntry = issue.split('Nº')[1].split(',')[0].trim();
+			if (issueEntry) item.issue = issueEntry.replace('-','/');
 		}
 		// variable for other split seperator 'Fasc.''
 		var multiIssue = ZU.xpathText(doc, '//*[@id="informacion"]//a[contains(text(), "Fasc.")]');
  		if (multiIssue) {
  			item.issue = multiIssue.split('Fasc.')[1].split(',')[0].trim();
  		}
- 		// replace issue number with volume number for certain journals e.g. 'Analecta calasanctiana: publicación semestral religioso cultural y de investigación histórica' 
- 		let volumeEntry = ZU.xpathText(doc, '//meta[@name="DC.source"]/@content');
-		if (item.ISSN && ['0569-9789', '0392-2855', '1594-3445', '1124-1225'].includes(item.ISSN)) {
-			item.volume = item.issue;
-		}
-		// replace issue by the volume number
-		if (['1124-1225', '1122-5661', '0039-3258', '0212-1964', '1888-346X', '0569-9789'].includes(item.ISSN)) {
-			item.volume = volumeEntry.split('Nº.')[1].split(',')[0].trim();
-		}
-		// replace issue by the volume number and scrape issue number e.g.  Studia monastica, ISSN 0039-3258, Nº. 64, 2, 2022, S. 491-504
-		if (['0039-3258'].includes(item.ISSN)) {
-			item.volume = volumeEntry.split('Nº.')[1].split(',')[0].trim();
-			item.issue = volumeEntry.split('Nº.')[1].split(',')[1].split(',')[0].trim();
-		}
-		//if (['0392-2855'].includes(item.ISSN)) item.volume = item.issue;
 		if (item.issue) {
 			if (item.issue === item.volume) delete item.issue;
 		} 
 		
- 		if (item.title.match(/ISBN/ig)) item.tags.push("RezensionstagPica");
-		let translatedTitle = 0;
+		if (item.title.match(/ISBN/ig)) item.tags.push("Book Review");
 		let allTitle =doc.querySelectorAll('meta[name="DC.title"]');
 		if (allTitle) {
 			for (let additionalTitle of allTitle) {
 			if (additionalTitle == 0) item.title = ZU.trimInternal(additionalTitle.content);
-			else if (ZU.trimInternal(additionalTitle.content) !== item.title) item.notes.push('Paralleltitel:' + ZU.trimInternal(additionalTitle.content));
+			else if (ZU.trimInternal(additionalTitle.content) !== item.title) item.notes.push('additional_title:' + ZU.trimInternal(additionalTitle.content));
 			additionalTitle += 1;
 			}
 		}
@@ -171,12 +153,11 @@ function scrape(doc, url) {
 		if (item.tags) {
 			for (let t of item.tags) {
 				if (t.includes('Book Review')) {
-				item.tags = item.tags.slice(-1);
+					item.tags = item.tags.slice(-1);
 				}
 			}
 		}
 		if (!item.tags.includes('Book Review')) delete item.tags;
-
 		item.attachments = [];
 		item.complete();
 	});
