@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-27 07:12:15"
+	"lastUpdated": "2025-08-29 12:19:45"
 }
 
 /*
@@ -265,8 +265,8 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (['2317-4307', '1980-6736', '2237-6461'].includes(item.ISSN)) {
-			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas'];
+		if (['2317-4307', '1980-6736', '2237-6461', '2595-5977'].includes(item.ISSN)) {
+			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas', 'Recensões'];
 			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
 			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
 				item.tags.push("Book Review")
@@ -275,6 +275,41 @@ function scrape(doc, url) {
 				if (item.tags[i] === "---") {
 					item.tags.splice(i, 1);
 				}
+			}
+		}
+
+		if (item.ISSN == '2595-5977') {
+			let rawDescription = item.abstractNote;
+			let keywords = new Set();
+			let keywordMatches = [...rawDescription.matchAll(/(?:Keywords|Palavras\-chave):\s*([^\n\r]+)/gi)];
+			for (let m of keywordMatches) {
+				let kwList = m[1]
+					.split(/;|,/)
+					.map(k => k.trim())
+					.filter(k => k);
+				kwList.forEach(k => keywords.add(k));
+				rawDescription = rawDescription.replace(m[0], '').trim();
+			}
+			if (keywords.size) {
+				item.tags = [...keywords];
+			}
+			let secondAbstract = '';
+			let secondAbstractMatch = rawDescription.match(/(?:\n|^)Abstract:\s*([\s\S]+)/i);
+			if (secondAbstractMatch) {
+				secondAbstract = secondAbstractMatch[1].trim();
+				rawDescription = rawDescription.replace(/Abstract:\s*[\s\S]+$/, '').trim();
+			}
+			let firstAbstract = rawDescription.trim();
+			if (firstAbstract) {
+				item.abstractNote = firstAbstract;
+				if (secondAbstract) {
+					item.notes.push('abs:' + secondAbstract);
+				}
+			} else if (secondAbstract) {
+				item.abstractNote = secondAbstract;
+			}
+			if (keywords.length) {
+				item.tags = keywords;
 			}
 		}
 

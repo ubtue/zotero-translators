@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-19 06:25:14"
+	"lastUpdated": "2025-08-27 13:34:07"
 }
 
 /*
@@ -91,8 +91,11 @@ function invokeEMTranslator(doc, url) {
 		}
 		if (i.reportType === "book-review") i.tags.push('Book review') && delete i.abstractNote;	
 		let pagesEntry = text(doc, '.publicationContentPages');
-		if(pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/) != null)
-    		i.pages = pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/)[0];
+		if(pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/) != null) {
+			i.pages = pagesEntry.match(/\s(\d+\w?|[ivxlcdmIVXLCDM]+)-(\d+\w?|[ivxlcdmIVXLCDM]+)/)[0];
+		} else if (pagesEntry.match(/\s(\d+\w?\*)-(\d+\w?\*)/)) {
+			i.pages = pagesEntry.match(/\s(\d+\w?\*)-(\d+\w?\*)/)[0].replaceAll('*','');
+		}
 		let volumes = text(doc, '.breadcrumbs');
 		i.volume = volumes?.match(/Volume\s?\d+/)?.[0]?.replace('Volume', '').trim() ?? null;
 		if (i.ISSN='2507-0290' && !i.volume) i.volume = volumes?.match(/Volume\s?\w+/)?.[0]?.replace('Volume', '').trim() ?? null;
