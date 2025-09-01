@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-29 12:19:45"
+	"lastUpdated": "2025-09-01 07:31:15"
 }
 
 /*
@@ -382,9 +382,26 @@ function scrape(doc, url) {
 			if (item.pages && item.pages.includes('page')) item.pages = ''
 		}
 
-		if (item.ISSN == "2237-6461" && item.title) {
+		if (item.ISSN == '2237-6461' && item.title) {
 				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			}
+
+		if (item.ISSN == '2175-5841') {
+			breadcrumbs = ZU.xpathText(doc, '//ol[@class="breadcrumb"]');
+			if (breadcrumbs && !item.volume) {
+				breadcrumbs = breadcrumbs.replace(/\s+/g, ' ').trim();
+				let match = breadcrumbs.match(/v(?:ol)?\.?\s*[:.]?\s*(\d+)[,\s]+n(?:[º°]|\.)?\.?\s*[:.]?\s*(\d+)/i);
+				Z.debug(match)
+				if (match) {
+					if (match[1]) item.volume = match[1];
+					if (match[2]) item.issue = match[2];
+				}
+			}
+			if (item.pages.startsWith('e')) {
+				item.notes.push("articleid:" + item.pages);
+				item.pages='';
+			}
+		}
 
 		if (item.issue) {
 			item.issue = item.issue.replace("-", "/");
