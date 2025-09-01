@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-26 11:22:20"
+	"lastUpdated": "2025-09-01 12:23:29"
 }
 
 /*
@@ -95,9 +95,18 @@ function invokeEmbeddedMetadataTranslator(doc, url) {
 			authors = ZU.xpath(doc, '//tr[@id="mods_name-roleTerm_Author"]');
 			for (let i in authors) {
 				if(authors[i].innerHTML.includes("orcid")) {
-					let name = authors[i].innerHTML.match(/>([^<]*),\s?([^<]*)<\/a>\s?<a\shref=\s?"https?:\/\/orcid/);
-					firstname = name[2];
-					lastname = name[1];
+					let namePart = authors[i].innerHTML.match(/<a[^>]*class="personalName"[^>]*>([^<]+)<\/a>/);
+					let fullname = namePart ? namePart[1].trim() : "";
+					let firstname = "", lastname = "";
+					if (fullname.includes(",")) {
+					let parts = fullname.split(",");
+					lastname = parts[0].trim();
+					firstname = parts[1].trim();
+					} else {
+					let parts = fullname.split(/\s+/);
+					lastname = parts.pop();
+					firstname = parts.join(" ");
+					}
 					orcid = authors[i].innerHTML.match(/<a\shref=\s?"https?:\/\/orcid\.org\/(\d{4}-\d{4}-\d{4}-\d{3}(?:\d|X|x))/)[1];
 					item.notes.push({"note": "orcid:" + orcid + " | " + firstname + " " + lastname});
 				}

@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-01 07:31:15"
+	"lastUpdated": "2025-09-01 13:35:27"
 }
 
 /*
@@ -382,7 +382,7 @@ function scrape(doc, url) {
 			if (item.pages && item.pages.includes('page')) item.pages = ''
 		}
 
-		if (item.ISSN == '2237-6461' && item.title) {
+		if (['2237-6461', '2317-4307'].includes(item.ISSN) && item.title) {
 				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			}
 

@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-27 11:26:53"
+	"lastUpdated": "2025-09-01 13:10:00"
 }
 
 /*
@@ -85,20 +85,20 @@ function doWeb(doc, url) {
 }
 
 function getORCID(doc, item) {
-    let authorSpans = doc.querySelectorAll('div[style*="margin-bottom"] > span');
-    for (let span of authorSpans) {
-        let authorLink = span.querySelector('a[href^="/servlet/autor"]');
-        let orcidLink = span.querySelector('a[href^="https://orcid.org/"]');
-        if (authorLink && orcidLink) {
-            let authorName = authorLink.textContent.trim();
-            let orcidMatch = orcidLink.href.match(/(\d{4}-\d{4}-\d{4}-\d{3}[\dX])/i);
-            if (orcidMatch) {
-                let orcid = orcidMatch[1];
-                item.notes.push({note: "orcid:" + orcid + " | " + authorName});
-            }
-        }
-    }
-    item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
+	let authorSpans = doc.querySelectorAll('div[style*="margin-bottom"] > span');
+	for (let span of authorSpans) {
+		let authorLink = span.querySelector('a[href^="/servlet/autor"]');
+		let orcidLink = span.querySelector('a[href^="https://orcid.org/"]');
+		if (authorLink && orcidLink) {
+			let authorName = authorLink.textContent.trim().replaceAll(',','');
+			let orcidMatch = orcidLink.href.match(/(\d{4}-\d{4}-\d{4}-\d{3}[\dX])/i);
+			if (orcidMatch) {
+				let orcid = orcidMatch[1];
+				item.notes.push({note: "orcid:" + orcid + " | " + authorName});
+			}
+		}
+	}
+	item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
 }
 
 function scrape(doc, url) {
@@ -134,7 +134,17 @@ function scrape(doc, url) {
  		}
 		if (item.issue) {
 			if (item.issue === item.volume) delete item.issue;
-		} 
+		}
+
+		var citationPdfUrlMeta = doc.querySelector('li[id="noTexto"]');
+            if (citationPdfUrlMeta) {
+                if (!item.notes) {
+                        item.notes = [];
+                }
+                if (!item.notes.some(note => note.note && note.note.includes("no_pdf:Artikelseite enthält keinen Volltext"))) {
+                        item.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
+                }
+            }
 		
 		if (item.title.match(/ISBN/ig)) item.tags.push("Book Review");
 		let allTitle =doc.querySelectorAll('meta[name="DC.title"]');
