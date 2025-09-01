@@ -1,15 +1,15 @@
 {
-    "translatorID": "44e1cd2d-f0cb-43d9-95c2-653bd17b625f",
-    "label": "Portal de Periodicos Eletronicos",
-    "creator": "Madeesh Kannan",
-    "target": "^https?:\/\/periodicos.pucminas.br\/",
-    "minVersion": "3.0",
-    "maxVersion": "",
-    "priority": 90,
-    "inRepository": false,
-    "translatorType": 4,
-    "browserSupport": "gcsibv",
-    "lastUpdated": "2019-03-15 13:14:00"
+	"translatorID": "44e1cd2d-f0cb-43d9-95c2-653bd17b625f",
+	"label": "ubtue_Portal de Periodicos Eletronicos",
+	"creator": "Madeesh Kannan",
+	"target": "^https?://periodicos.pucminas.br/",
+	"minVersion": "3.0",
+	"maxVersion": "",
+	"priority": 90,
+	"inRepository": true,
+	"translatorType": 4,
+	"browserSupport": "gcsibv",
+	"lastUpdated": "2025-09-01 10:38:22"
 }
 
 /*
@@ -35,12 +35,12 @@
 
 
 function detectWeb(doc, url) {
-    if (url.match(/\/issue\/view\//))
-        return "multiple";
-    else if (url.match(/\/article\/view\//)) {
-        // placeholder, the OJS translator fills in the correct item type
-        return "journalArticle";
-    }
+	if (url.match(/\/issue\/view\//))
+		return "multiple";
+	else if (url.match(/\/article\/view\//)) {
+		// placeholder, the OJS translator fills in the correct item type
+		return "journalArticle";
+	}
 }
 
 function getSearchResults(doc) {
@@ -58,21 +58,21 @@ function getSearchResults(doc) {
 }
 
 function postProcess(doc, item) {
-    item.complete();
+	item.complete();
 }
 
 function invokeOJSTranslator(doc) {
-    var translator = Zotero.loadTranslator("web");
-    translator.setTranslator("99b62ba4-065c-4e83-a5c0-d8cc0c75d388");
-    translator.setDocument(doc);
-    translator.setHandler("itemDone", function (t, i) {
-        postProcess(doc, i);
-    });
-    translator.translate();
+	var translator = Zotero.loadTranslator("web");
+	translator.setTranslator("a5d5ca83-b975-4abe-86c9-d956d7b9c8fa");
+	translator.setDocument(doc);
+	translator.setHandler("itemDone", function (t, i) {
+		postProcess(doc, i);
+	});
+	translator.translate();
 }
 
 function doWeb(doc, url) {
-    if (detectWeb(doc, url) === "multiple") {
+	if (detectWeb(doc, url) === "multiple") {
 		Zotero.selectItems(getSearchResults(doc), function (items) {
 			if (!items) {
 				return true;
@@ -83,6 +83,11 @@ function doWeb(doc, url) {
 			}
 			ZU.processDocuments(articles, invokeOJSTranslator);
 		});
-    } else
-        invokeOJSTranslator(doc);
+	} else
+		invokeOJSTranslator(doc);
 }
+
+/** BEGIN TEST CASES **/
+var testCases = [
+]
+/** END TEST CASES **/
