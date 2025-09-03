@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-26 09:00:58"
+	"lastUpdated": "2025-09-03 06:07:33"
 }
 
 /*
@@ -88,9 +88,9 @@ async function scrape(doc, url = doc.location.href) {
 		item.complete();
 	});
 
-	let em = await translator.getTranslatorObject();
-	
-	await em.doWeb(doc, url);
+	translator.getTranslatorObject(function(em) {
+		em.doWeb(doc, url);
+	});
 }
 
 /** BEGIN TEST CASES **/
