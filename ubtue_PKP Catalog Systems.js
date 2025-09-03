@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-01 13:35:27"
+	"lastUpdated": "2025-09-03 09:19:58"
 }
 
 /*
@@ -401,6 +401,24 @@ function scrape(doc, url) {
 				item.notes.push("articleid:" + item.pages);
 				item.pages='';
 			}
+		}
+
+		if (item.ISSN == '1980-6736' && item.tags && item.tags.length) {
+			let newTags = [];
+			for (let t of item.tags) {
+				if (t.includes(".")) {
+					let keywords = t.split(".")
+						.map(s => s.trim())
+						.filter(s => s.length > 0);
+
+					for (let k of keywords) {
+						newTags.push({ tag: k });
+					}
+				} else {
+					newTags.push({ tag: t.trim() });
+				}
+			}
+			item.tags = newTags;
 		}
 
 		if (item.issue) {
