@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-03 09:19:58"
+	"lastUpdated": "2025-09-03 11:14:01"
 }
 
 /*
@@ -278,10 +278,10 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (item.ISSN == '2595-5977') {
+		if (['2595-5977', '1980-6736'].includes(item.ISSN)) {
 			let rawDescription = item.abstractNote;
 			let keywords = new Set();
-			let keywordMatches = [...rawDescription.matchAll(/(?:Keywords|Palavras\-chave):\s*([^\n\r]+)/gi)];
+			let keywordMatches = [...rawDescription.matchAll(/(?:Keywords|Key words|Palavras\-chave):\s*([^\n\r]+)/gi)];
 			for (let m of keywordMatches) {
 				let kwList = m[1]
 					.split(/;|,/)
@@ -294,10 +294,10 @@ function scrape(doc, url) {
 				item.tags = [...keywords];
 			}
 			let secondAbstract = '';
-			let secondAbstractMatch = rawDescription.match(/(?:\n|^)Abstract:\s*([\s\S]+)/i);
+			let secondAbstractMatch = rawDescription.match(/(?:\n|^)Abstract:?\s*([\s\S]+)/i);
 			if (secondAbstractMatch) {
 				secondAbstract = secondAbstractMatch[1].trim();
-				rawDescription = rawDescription.replace(/Abstract:\s*[\s\S]+$/, '').trim();
+				rawDescription = rawDescription.replace(/Abstract:?\s*[\s\S]+$/, '').trim();
 			}
 			let firstAbstract = rawDescription.trim();
 			if (firstAbstract) {
@@ -307,9 +307,6 @@ function scrape(doc, url) {
 				}
 			} else if (secondAbstract) {
 				item.abstractNote = secondAbstract;
-			}
-			if (keywords.length) {
-				item.tags = keywords;
 			}
 		}
 
@@ -397,13 +394,10 @@ function scrape(doc, url) {
 					if (match[2]) item.issue = match[2];
 				}
 			}
-			if (item.pages.startsWith('e')) {
-				item.notes.push("articleid:" + item.pages);
-				item.pages='';
-			}
 		}
 
 		if (item.ISSN == '1980-6736' && item.tags && item.tags.length) {
+			if (item.title) item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			let newTags = [];
 			for (let t of item.tags) {
 				if (t.includes(".")) {
@@ -419,6 +413,11 @@ function scrape(doc, url) {
 				}
 			}
 			item.tags = newTags;
+		}
+
+		if (item.pages && item.pages.startsWith('e')) {
+			item.notes.push("articleid:" + item.pages);
+			item.pages='';
 		}
 
 		if (item.issue) {
