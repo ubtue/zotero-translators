@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-26 11:57:27"
+	"lastUpdated": "2025-09-04 12:29:32"
 }
 
 /*
@@ -70,10 +70,6 @@ function addBookReviewTag(doc, item) {
 	if (primaryHeading.match(/Book Review\b|Review Essays?|Reviews?\b|Book Discussion\b|Criticism of Current Literature/i)) {
 		item.tags.push('Book Review');
 	}
-}
-
-function sentenceCase(str) {
-  return str.toLowerCase().replace(/(^\w|[.!?]\s*\w)/g, c => c.toUpperCase());
 }
 
 function addPages (doc, item) {
@@ -406,10 +402,6 @@ function scrapeBibTeX(doc, url) {
 			// Workaround for erroneous Bibtex and RIS information for reviews
 			handleErroneousReviewTitles(doc, item);
 			normalizeTitle(item);
-
-			if (item.ISSN == "1540-6385" && item.title) {
-				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
-			}
 
 			item.complete();
 		});

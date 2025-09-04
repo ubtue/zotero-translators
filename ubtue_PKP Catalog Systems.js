@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-04 09:31:51"
+	"lastUpdated": "2025-09-04 12:28:41"
 }
 
 /*
@@ -136,10 +136,6 @@ function cleanAbstractNote(text) {
 	return text.replace(/&nbsp;/g, ' ').trim();
 }
 
-function sentenceCase(str) {
-  return str.toLowerCase().replace(/(^\w|[.!?]\s*\w)/g, c => c.toUpperCase());
-}
-
 function scrape(doc, url) {
 	// use Embeded Metadata
 	var trans = Zotero.loadTranslator('web');
@@ -154,6 +150,9 @@ function scrape(doc, url) {
 
 		if (!item.title) {
 			item.title = text(doc, '#articleTitle');
+		}
+		if (item.title && item.title.toUpperCase() == item.title) {
+			item.title = ZU.capitalizeTitle(item.title, true);
 		}
 		if (item.creators.length == 0) {
 			var authorString = doc.getElementById("authorString");
@@ -379,10 +378,6 @@ function scrape(doc, url) {
 			if (item.pages && item.pages.includes('page')) item.pages = ''
 		}
 
-		if (['2237-6461', '2317-4307', '2175-5841'].includes(item.ISSN) && item.title) {
-				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
-			}
-
 		if (item.ISSN == '2175-5841') {
 			breadcrumbs = ZU.xpathText(doc, '//ol[@class="breadcrumb"]');
 			if (breadcrumbs && !item.volume) {
@@ -399,7 +394,6 @@ function scrape(doc, url) {
 		}
 
 		if (item.ISSN == '1980-6736' && item.tags && item.tags.length) {
-			if (item.title) item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			let newTags = [];
 			for (let t of item.tags) {
 				if (t.includes(".")) {
