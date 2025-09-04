@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-01 13:10:00"
+	"lastUpdated": "2025-09-04 14:20:37"
 }
 
 /*
@@ -101,12 +101,25 @@ function getORCID(doc, item) {
 	item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
 }
 
+function normaliseTitle(title) {
+	if (title) {
+		let match = title.match(/^([A-Z\s\.]+)(.*)$/);
+		if (match) {
+			let upperTitle = match[1].trim();
+			let rest = match[2].trim();
+			let capitalized = ZU.capitalizeTitle(upperTitle, true);
+			return capitalized + (rest ? " " + rest : "");
+		}
+	}
+}
+
 function scrape(doc, url) {
 	var translator = Zotero.loadTranslator('web');
 	// Embedded Metadata
 	translator.setTranslator('951c027d-74ac-47d4-a107-9c3069ab7b48');
 	translator.setHandler('itemDone', function (obj, item) {
 		item.url = url;
+		item.title = normaliseTitle(item.title);
 		// Delete generic abstract as "Información del artículo <title>"
 		if (item.abstractNote && item.abstractNote.includes(item.title) && item.abstractNote.length<item.title.length+30 || item.abstractNote.match(/Autoría|Localización/)) {
 			delete item.abstractNote;
@@ -137,22 +150,23 @@ function scrape(doc, url) {
 		}
 
 		var citationPdfUrlMeta = doc.querySelector('li[id="noTexto"]');
-            if (citationPdfUrlMeta) {
-                if (!item.notes) {
-                        item.notes = [];
-                }
-                if (!item.notes.some(note => note.note && note.note.includes("no_pdf:Artikelseite enthält keinen Volltext"))) {
-                        item.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
-                }
-            }
+			if (citationPdfUrlMeta) {
+				if (!item.notes) {
+						item.notes = [];
+				}
+				if (!item.notes.some(note => note.note && note.note.includes("no_pdf:Artikelseite enthält keinen Volltext"))) {
+						item.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
+				}
+			}
 		
 		if (item.title.match(/ISBN/ig)) item.tags.push("Book Review");
 		let allTitle =doc.querySelectorAll('meta[name="DC.title"]');
 		if (allTitle) {
 			for (let additionalTitle of allTitle) {
-			if (additionalTitle == 0) item.title = ZU.trimInternal(additionalTitle.content);
-			else if (ZU.trimInternal(additionalTitle.content) !== item.title) item.notes.push('additional_title:' + ZU.trimInternal(additionalTitle.content));
-			additionalTitle += 1;
+				let alternativeTitle = ZU.trimInternal(additionalTitle.content);
+				if (additionalTitle == 0) item.title = normaliseTitle(alternativeTitle);
+				else if (normaliseTitle(alternativeTitle) !== item.title) item.notes.push('additional_title:' + normaliseTitle(alternativeTitle));
+				additionalTitle += 1;
 			}
 		}
 		if (item.ISSN = '0018-215X') {
