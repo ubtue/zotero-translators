@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-04 07:45:40"
+	"lastUpdated": "2025-09-04 09:31:51"
 }
 
 /*
@@ -379,7 +379,7 @@ function scrape(doc, url) {
 			if (item.pages && item.pages.includes('page')) item.pages = ''
 		}
 
-		if (['2237-6461', '2317-4307'].includes(item.ISSN) && item.title) {
+		if (['2237-6461', '2317-4307', '2175-5841'].includes(item.ISSN) && item.title) {
 				item.title = item.title.replace(/\b[A-Z-]{2,}\b/g, match => sentenceCase(match));
 			}
 
@@ -388,11 +388,13 @@ function scrape(doc, url) {
 			if (breadcrumbs && !item.volume) {
 				breadcrumbs = breadcrumbs.replace(/\s+/g, ' ').trim();
 				let match = breadcrumbs.match(/v(?:ol)?\.?\s*[:.]?\s*(\d+)[,\s]+n(?:[º°]|\.)?\.?\s*[:.]?\s*(\d+)/i);
-				Z.debug(match)
 				if (match) {
 					if (match[1]) item.volume = match[1];
 					if (match[2]) item.issue = match[2];
 				}
+			}
+			if (item.title && item.abstractNote && item.abstractNote.includes(item.title)) {
+				item.abstractNote='';
 			}
 		}
 

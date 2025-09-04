@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-03 08:49:47"
+	"lastUpdated": "2025-09-04 09:33:03"
 }
 
 /*
@@ -53,7 +53,7 @@ function getSearchResults(doc) {
 
 
 function splitDotSeparatedKeywords(item) {
-	if (item.ISSN === '2340-0080' && item.tags.length) {
+	if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags.length) {
 		let split_tags = [];
 		for (const tags of item.tags)
 			split_tags.push(...tags.split('.'));
@@ -279,6 +279,7 @@ function invokeUbtuePKPTranslator(doc) {
 			}
 			if (i.abstractNote && !(i.abstractNote.trim().substring(0, 20) == abs.textContent.trim().replace(abstractRegex, '').substring(0, 20)) && !found) {
 				if (abs.textContent.length)
+					if (abs.textContent.includes(i.title)) continue;
 					absCount == 0 ? i.notes.push('abs:' + ZU.trimInternal(abs.textContent)) : i.notes.push('abs1:' + ZU.trimInternal(abs.textContent));
 					++absCount
 			}
