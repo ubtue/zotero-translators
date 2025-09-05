@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 06:51:25"
+	"lastUpdated": "2025-09-05 10:48:24"
 }
 
 /*
@@ -110,14 +110,14 @@ function handleErroneousReviewTitles(doc, item) {
 }
 
 function normaliseTitle(title) {
-	if (title) {
-		let match = title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/);
-		if (!match) return title;
-		let upperTitle = match[1].trim();
-		let rest = match[2].trim();
-		let capitalized = ZU.capitalizeTitle(upperTitle, true);
-		return capitalized + (rest ? " " + rest : "");
-	}
+    if (title) {
+		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s;,\(\)]*)+))(.*)/)
+        if (!match) return title;
+        let upperTitle = match[1].trim();
+        let rest = match[3].trim();
+        let capitalized = ZU.capitalizeTitle(upperTitle, true);
+        return capitalized + (rest ? " " + rest : "");
+    }
 }
 
 function scrapeBook(doc, url) {
@@ -321,10 +321,10 @@ function scrapeBibTeX(doc, url) {
 			}
 
 			//title
-			if (item.title && item.title.toUpperCase() == item.title) {
+			if (item.title && item.title.toUpperCase() === item.title) {
 				item.title = ZU.capitalizeTitle(item.title, true);
-			} else if (item.title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/)) {
-				item.title=normaliseTitle(item.title);
+			} else if (item.title && /[A-Z]{2,}/.test(item.title)) {
+				item.title = normaliseTitle(item.title);
 			}
 
 			//subtitle

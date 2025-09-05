@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 06:58:24"
+	"lastUpdated": "2025-09-05 10:49:18"
 }
 
 /*
@@ -103,13 +103,12 @@ function getORCID(doc, item) {
 
 function normaliseTitle(title) {
 	if (title) {
-		let match = title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/);
-		if (match) {
-			let upperTitle = match[1].trim();
-			let rest = match[2].trim();
-			let capitalized = ZU.capitalizeTitle(upperTitle, true);
-			return capitalized + (rest ? " " + rest : "");
-		}
+		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s;,\(\)]*)+))(.*)/)
+		if (!match) return title;
+		let upperTitle = match[1].trim();
+		let rest = match[3].trim();
+		let capitalized = ZU.capitalizeTitle(upperTitle, true);
+		return capitalized + (rest ? " " + rest : "");
 	}
 }
 
@@ -119,8 +118,11 @@ function scrape(doc, url) {
 	translator.setTranslator('951c027d-74ac-47d4-a107-9c3069ab7b48');
 	translator.setHandler('itemDone', function (obj, item) {
 		item.url = url;
-		if (item.title && item.title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/))
+		if (item.title && item.title.toUpperCase() === item.title) {
+			item.title = ZU.capitalizeTitle(item.title, true);
+		} else if (item.title && /[A-Z]{2,}/.test(item.title)) {
 			item.title = normaliseTitle(item.title);
+		}
 		// Delete generic abstract as "Información del artículo <title>"
 		if (item.abstractNote && item.abstractNote.includes(item.title) && item.abstractNote.length<item.title.length+30 || item.abstractNote.match(/Autoría|Localización/)) {
 			delete item.abstractNote;
@@ -165,7 +167,7 @@ function scrape(doc, url) {
 		if (allTitle) {
 			allTitle.forEach((additionalTitle, index) => {
 			let alternativeTitle = ZU.trimInternal(additionalTitle.content);
-			if (/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/.test(alternativeTitle)) alternativeTitle = normaliseTitle(alternativeTitle);
+			if (/[A-Z]{2,}/.test(alternativeTitle)) alternativeTitle = normaliseTitle(alternativeTitle);
 			if (index === 0) item.title = alternativeTitle;
 			else if (alternativeTitle !== item.title) item.notes.push('additional_title:' + alternativeTitle);
 			});
