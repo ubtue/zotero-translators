@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 06:52:41"
+	"lastUpdated": "2025-09-05 07:57:39"
 }
 
 /*
@@ -289,32 +289,38 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (['2595-5977', '1980-6736'].includes(item.ISSN)) {
+		if (['2595-5977', '1980-6736', '2175-5841'].includes(item.ISSN)) {
 			let rawDescription = item.abstractNote;
 			let keywords = new Set();
-			let keywordMatches = [...rawDescription.matchAll(/(?:Keywords|Key words|Palavras\-chave):\s*([^\n\r]+)/gi)];
+			let keywordMatches = [...rawDescription.matchAll(
+				/(?:Keywords|Key words|Palavras\-chave):\s*([\s\S]*?)(?=\s*(?:Abstract|Resumo|Resúmen|Summary|$))/gi
+			)];
 			for (let m of keywordMatches) {
 				let kwList = m[1]
 					.split(/;|,/)
 					.map(k => k.trim())
 					.filter(k => k);
 				kwList.forEach(k => keywords.add(k));
-				rawDescription = rawDescription.replace(m[0], '').trim();
+
+				rawDescription = rawDescription.replace(m[0], "").trim();
 			}
 			if (keywords.size) {
 				item.tags = [...keywords];
 			}
 			let secondAbstract = '';
-			let secondAbstractMatch = rawDescription.match(/(?:\n|^)Abstract:?\s*([\s\S]+)/i);
+			let secondAbstractMatch = rawDescription.match(/(?:\n|^)\s*Abstract:?[\s]*([\s\S]+)/i);
+			if (!secondAbstractMatch) {
+				secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)Abstract([\s\S]+)/i);
+			}
 			if (secondAbstractMatch) {
 				secondAbstract = secondAbstractMatch[1].trim();
-				rawDescription = rawDescription.replace(/Abstract:?\s*[\s\S]+$/, '').trim();
+				rawDescription = rawDescription.replace(/Abstract:?[\s\S]+$/i, '').trim();
 			}
 			let firstAbstract = rawDescription.trim();
 			if (firstAbstract) {
 				item.abstractNote = firstAbstract;
 				if (secondAbstract) {
-					item.notes.push('abs:' + secondAbstract);
+					item.notes.push("abs:" + secondAbstract);
 				}
 			} else if (secondAbstract) {
 				item.abstractNote = secondAbstract;
