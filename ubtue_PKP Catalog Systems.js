@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 08:20:28"
+	"lastUpdated": "2025-09-05 08:51:13"
 }
 
 /*
@@ -293,7 +293,7 @@ function scrape(doc, url) {
 			let rawDescription = item.abstractNote;
 			let keywords = new Set();
 			let keywordMatches = [...rawDescription.matchAll(
-				/(?:Keywords|Key words|Palavras\-chave):\s*([\s\S]*?)(?=\s*(?:Abstract|Resumo|Resúmen|Summary|$))/gi
+				/(?:Keywords|Key words|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Summary|$))/gi
 			)];
 			for (let m of keywordMatches) {
 				let kwList = m[1].replace(/(Keywords|Key words|Key works):?/i, '')
@@ -307,13 +307,13 @@ function scrape(doc, url) {
 				item.tags = [...keywords];
 			}
 			let secondAbstract = '';
-			let secondAbstractMatch = rawDescription.match(/(?:\n|^)\s*Abstract:?[\s]*([\s\S]+)/i);
+			let secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)(Abstract|Asbtract):?[\s]*([\s\S]+)/i);
 			if (!secondAbstractMatch) {
-				secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)Abstract([\s\S]+)/i);
+				secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)(Abstract|Asbtract)([\s\S]+)/i);
 			}
 			if (secondAbstractMatch) {
-				secondAbstract = secondAbstractMatch[1].trim();
-				rawDescription = rawDescription.replace(/Abstract:?[\s\S]+$/i, '').trim();
+				secondAbstract = secondAbstractMatch[2].trim();
+				rawDescription = rawDescription.replace(/(Abstract|Asbtract):?[\s\S]+$/i, '').trim();
 			}
 			let firstAbstract = rawDescription.trim();
 			if (firstAbstract) {
