@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 08:14:43"
+	"lastUpdated": "2025-09-05 08:20:28"
 }
 
 /*
@@ -296,7 +296,7 @@ function scrape(doc, url) {
 				/(?:Keywords|Key words|Palavras\-chave):\s*([\s\S]*?)(?=\s*(?:Abstract|Resumo|Resúmen|Summary|$))/gi
 			)];
 			for (let m of keywordMatches) {
-				let kwList = m[1].replace(/Keywords|Key words|Key works/i, '')
+				let kwList = m[1].replace(/(Keywords|Key words|Key works):?/i, '')
 					.split(/;|,/)
 					.map(k => k.trim())
 					.filter(k => k);
