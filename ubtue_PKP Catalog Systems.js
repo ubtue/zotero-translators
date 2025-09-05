@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 06:28:35"
+	"lastUpdated": "2025-09-05 06:52:41"
 }
 
 /*
@@ -137,14 +137,14 @@ function cleanAbstractNote(text) {
 }
 
 function normaliseTitle(title) {
-    if (title) {
-        let match = title.match(/^([A-Z\s\.]+)(.*)$/);
-        if (!match) return title;
-        let upperTitle = match[1].trim();
-        let rest = match[2].trim();
-        let capitalized = ZU.capitalizeTitle(upperTitle, true);
-        return capitalized + (rest ? " " + rest : "");
-    }
+	if (title) {
+		let match = title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/);
+		if (!match) return title;
+		let upperTitle = match[1].trim();
+		let rest = match[2].trim();
+		let capitalized = ZU.capitalizeTitle(upperTitle, true);
+		return capitalized + (rest ? " " + rest : "");
+	}
 }
 
 function scrape(doc, url) {
@@ -164,7 +164,7 @@ function scrape(doc, url) {
 		}
 		if (item.title && item.title.toUpperCase() == item.title) {
 			item.title = ZU.capitalizeTitle(item.title, true);
-		} else if (item.title && item.title.match(/^([A-Z\s\.]+)(.*)$/))
+		} else if (item.title && item.title.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/))
 			item.title = normaliseTitle(item.title)
 		if (item.creators.length == 0) {
 			var authorString = doc.getElementById("authorString");
