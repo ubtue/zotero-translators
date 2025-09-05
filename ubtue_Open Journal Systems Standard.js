@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-04 09:33:03"
+	"lastUpdated": "2025-09-05 07:05:25"
 }
 
 /*
@@ -53,13 +53,16 @@ function getSearchResults(doc) {
 
 
 function splitDotSeparatedKeywords(item) {
-	if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags.length) {
-		let split_tags = [];
-		for (const tags of item.tags)
-			split_tags.push(...tags.split('.'));
-		item.tags = split_tags;
-	}
-	return item.tags;
+    if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags?.length) {
+        let splitTags = [];
+        for (const tag of item.tags) {
+            let parts = tag.split('.');
+            parts = parts.map(s => s.trim()).filter(s => s.length > 0);
+            splitTags.push(...parts);
+        }
+        item.tags = [...new Set(splitTags)];
+    }
+    return item.tags;
 }
 
 
