@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-04 12:28:41"
+	"lastUpdated": "2025-09-05 06:28:35"
 }
 
 /*
@@ -136,6 +136,17 @@ function cleanAbstractNote(text) {
 	return text.replace(/&nbsp;/g, ' ').trim();
 }
 
+function normaliseTitle(title) {
+    if (title) {
+        let match = title.match(/^([A-Z\s\.]+)(.*)$/);
+        if (!match) return title;
+        let upperTitle = match[1].trim();
+        let rest = match[2].trim();
+        let capitalized = ZU.capitalizeTitle(upperTitle, true);
+        return capitalized + (rest ? " " + rest : "");
+    }
+}
+
 function scrape(doc, url) {
 	// use Embeded Metadata
 	var trans = Zotero.loadTranslator('web');
@@ -153,7 +164,8 @@ function scrape(doc, url) {
 		}
 		if (item.title && item.title.toUpperCase() == item.title) {
 			item.title = ZU.capitalizeTitle(item.title, true);
-		}
+		} else if (item.title && item.title.match(/^([A-Z\s\.]+)(.*)$/))
+			item.title = normaliseTitle(item.title)
 		if (item.creators.length == 0) {
 			var authorString = doc.getElementById("authorString");
 			if (authorString) {
