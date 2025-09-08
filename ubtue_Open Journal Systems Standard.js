@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 07:05:25"
+	"lastUpdated": "2025-09-08 09:45:30"
 }
 
 /*
@@ -53,16 +53,16 @@ function getSearchResults(doc) {
 
 
 function splitDotSeparatedKeywords(item) {
-    if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags?.length) {
-        let splitTags = [];
-        for (const tag of item.tags) {
-            let parts = tag.split('.');
-            parts = parts.map(s => s.trim()).filter(s => s.length > 0);
-            splitTags.push(...parts);
-        }
-        item.tags = [...new Set(splitTags)];
-    }
-    return item.tags;
+	if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags?.length) {
+		let splitTags = [];
+		for (const tag of item.tags) {
+			let parts = tag.split('.');
+			parts = parts.map(s => s.trim()).filter(s => s.length > 0);
+			splitTags.push(...parts);
+		}
+		item.tags = [...new Set(splitTags)];
+	}
+	return item.tags;
 }
 
 
@@ -280,7 +280,7 @@ function invokeUbtuePKPTranslator(doc) {
 			for (let note of i.notes) {
 				if (note.substring(4,24) == abs.textContent.replace(abstractRegex, '').substring(0,20)) found = true;
 			}
-			if (i.abstractNote && !(i.abstractNote.trim().substring(0, 20) == abs.textContent.trim().replace(abstractRegex, '').substring(0, 20)) && !found) {
+			if (i.abstractNote && !(i.abstractNote.trim().substring(0, 20) == abs.textContent.trim().replace(abstractRegex, '').substring(0, 20)) && !found && !abs.textContent.includes(i.abstractNote)) {
 				if (abs.textContent.length)
 					if (abs.textContent.includes(i.title)) continue;
 					absCount == 0 ? i.notes.push('abs:' + ZU.trimInternal(abs.textContent)) : i.notes.push('abs1:' + ZU.trimInternal(abs.textContent));

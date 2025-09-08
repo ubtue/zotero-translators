@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 09:14:34"
+	"lastUpdated": "2025-09-08 09:09:03"
 }
 
 /*
@@ -137,14 +137,14 @@ function cleanAbstractNote(text) {
 }
 
 function normaliseTitle(title) {
-    if (title) {
+	if (title) {
 		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s;,\(\)]*)+))(.*)/)
-        if (!match) return title;
-        let upperTitle = match[1].trim();
-        let rest = match[3].trim();
-        let capitalized = ZU.capitalizeTitle(upperTitle, true);
-        return capitalized + (rest ? " " + rest : "");
-    }
+		if (!match) return title;
+		let upperTitle = match[1].trim();
+		let rest = match[3].trim();
+		let capitalized = ZU.capitalizeTitle(upperTitle, true);
+		return capitalized + (rest ? " " + rest : "");
+	}
 }
 
 function scrape(doc, url) {
@@ -291,39 +291,68 @@ function scrape(doc, url) {
 		}
 
 		if (['2595-5977', '1980-6736', '2175-5841'].includes(item.ISSN)) {
-			let rawDescription = item.abstractNote;
+			let rawDescription = item.abstractNote.replace(/-?\s*DOI:\s*.*$/i, '').trim();
 			let keywords = new Set();
-			let keywordMatches = [...rawDescription.matchAll(
-				/(?:Keywords|Key words|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Summary|$))/gi
-			)];
-			for (let m of keywordMatches) {
-				let kwList = m[1].replace(/(Keywords|Key words|Key works):?/i, '')
+			const keywordRegex = /(?:Keywords|Key words|Palabras[\s|-]clave|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Resumen|Summary|-?\sDOI:|$))/gi;
+			for (const match of rawDescription.matchAll(keywordRegex)) {
+				const keywordText = match[1];
+				const kwList = keywordText
 					.split(/;|,/)
 					.map(k => k.trim())
-					.filter(k => k);
-				kwList.forEach(k => keywords.add(k));
-				rawDescription = rawDescription.replace(m[0], "").trim();
+					.filter(Boolean);
+				kwList.forEach(k => keywords.add(k.replace(/[.,;:]$/, '') ));
+
+				rawDescription = rawDescription.replace(match[0], '').trim();
 			}
 			if (keywords.size) {
 				item.tags = [...keywords];
 			}
-			let secondAbstract = '';
-			let secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)(Abstract|Asbtract):?[\s]*([\s\S]+)/i);
-			if (!secondAbstractMatch) {
-				secondAbstractMatch = rawDescription.match(/(?:\n|^|\s*)(Abstract|Asbtract)([\s\S]+)/i);
-			}
-			if (secondAbstractMatch) {
-				secondAbstract = secondAbstractMatch[2].trim();
-				rawDescription = rawDescription.replace(/(Abstract|Asbtract):?[\s\S]+$/i, '').trim();
-			}
-			let firstAbstract = rawDescription.trim();
-			if (firstAbstract) {
-				item.abstractNote = firstAbstract;
-				if (secondAbstract) {
-					item.notes.push("abs:" + secondAbstract);
+			function extractAbstract(text, labels, allLabels) {
+				const labelPattern = labels.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+				const lookaheadPattern = allLabels
+					.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+					.join('|');
+				const regex = new RegExp(
+					`(?:\\n|^|\\s*)(${labelPattern}):?\\s*([\\s\\S]*?)(?=\\s*(?:${lookaheadPattern}):?|$)`, 'i');
+				const match = text.match(regex);
+				if (match) {
+					const content = match[2].trim();
+					const fullMatch = match[0];
+					text = text.replace(fullMatch, '').trim();
+					return { content, text };
 				}
-			} else if (secondAbstract) {
-				item.abstractNote = secondAbstract;
+				return { content: '', text };
+			}
+			const allAbstractLabels = ['Abstract', 'Asbtract', 'Resumen', 'Resúmen', 'Resumo'];
+			const abstractLabelGroups = [
+				['Resumo'],
+				['Resumen', 'Resúmen'],
+				['Abstract', 'Asbtract']
+			];
+			let allAbstracts = [];
+			for (const labelGroup of abstractLabelGroups) {
+				const result = extractAbstract(rawDescription, labelGroup, allAbstractLabels);
+				if (result.content) {
+					allAbstracts.push(result.content);
+					rawDescription = result.text;
+				}
+			}
+			if (allAbstracts.length > 0 && rawDescription.trim()) {
+				item.abstractNote = rawDescription.trim();
+				item.notes.push(`abs:${allAbstracts[0]}`);
+				if (allAbstracts.length >= 2) {
+					item.notes.push(`abs1:${allAbstracts[1]}`);
+				}
+			} else if (allAbstracts.length > 0) {
+				item.abstractNote = allAbstracts[0];
+				if (allAbstracts.length === 2) {
+					item.notes.push(`abs:${allAbstracts[1]}`);
+				} else if (allAbstracts.length >= 3) {
+					item.notes.push(`abs:${allAbstracts[1]}`);
+					item.notes.push(`abs1:${allAbstracts[2]}`);
+				}
+			} else if (rawDescription.trim()) {
+				item.abstractNote = rawDescription.trim();
 			}
 		}
 
