@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-08 09:45:30"
+	"lastUpdated": "2025-09-25 11:10:57"
 }
 
 /*
@@ -53,7 +53,7 @@ function getSearchResults(doc) {
 
 
 function splitDotSeparatedKeywords(item) {
-	if (['2340-0080', '2175-5841'].includes(item.ISSN) && item.tags?.length) {
+	if (['2340-0080', '2175-5841', '2595-5977'].includes(item.ISSN) && item.tags?.length) {
 		let splitTags = [];
 		for (const tag of item.tags) {
 			let parts = tag.split('.');

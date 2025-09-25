@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 10:48:24"
+	"lastUpdated": "2025-09-24 12:56:21"
 }
 
 /*
@@ -99,9 +99,10 @@ function normalizeTitle(item) {
 function handleErroneousReviewTitles(doc, item) {
 	if (item.tags?.some(e => e == "Book Review" )) {
 		websiteTitle = ZU.xpathText(doc,'//*[@class="citation__title"]');
-		if (!websiteTitle)
+		if (!websiteTitle) {
 			return;
-		if (websiteTitle.match(/^\s*((?:[A-Z][A-Z\.]*(?:\s+|$)){2,})(.*)/)) {
+		}
+		if (websiteTitle.match(/^\s*((?:[A-Z][A-Z\.]{2,}(?:\s+|$)))(.*)/)) {
 			item.title = normaliseTitle(websiteTitle)
 			return;
 		}
@@ -110,14 +111,14 @@ function handleErroneousReviewTitles(doc, item) {
 }
 
 function normaliseTitle(title) {
-    if (title) {
-		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s;,\(\)]*)+))(.*)/)
-        if (!match) return title;
-        let upperTitle = match[1].trim();
-        let rest = match[3].trim();
-        let capitalized = ZU.capitalizeTitle(upperTitle, true);
-        return capitalized + (rest ? " " + rest : "");
-    }
+	if (title) {
+		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s:;,\(\)]*)+))*(.*)/)
+		if (!match) return title;
+		let upperTitle = match[1].trim();
+		let rest = match[3].trim();
+		let capitalized = ZU.capitalizeTitle(upperTitle, true);
+		return capitalized + (rest ? " " + rest : "");
+	}
 }
 
 function scrapeBook(doc, url) {

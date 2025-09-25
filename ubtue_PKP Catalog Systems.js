@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-08 09:09:03"
+	"lastUpdated": "2025-09-25 11:29:23"
 }
 
 /*
@@ -281,7 +281,7 @@ function scrape(doc, url) {
 			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas', 'Recensões'];
 			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
 			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
-				item.tags.push("Book Review")
+				item.tags.push({ tag: "Book Review" });
 			if (item.abstractNote && item.abstractNote == "---") item.abstractNote = ''
 			for (let i = item.tags.length - 1; i >= 0; i--) {
 				if (item.tags[i] === "---") {
@@ -293,7 +293,7 @@ function scrape(doc, url) {
 		if (['2595-5977', '1980-6736', '2175-5841'].includes(item.ISSN)) {
 			let rawDescription = item.abstractNote.replace(/-?\s*DOI:\s*.*$/i, '').trim();
 			let keywords = new Set();
-			const keywordRegex = /(?:Keywords|Key words|Palabras[\s|-]clave|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Resumen|Summary|-?\sDOI:|$))/gi;
+			const keywordRegex = /(?:Keywords|Key words|Palabras[\s|-]clave|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Resumen|Summary|-?\sDOI:|$))/g;
 			for (const match of rawDescription.matchAll(keywordRegex)) {
 				const keywordText = match[1];
 				const kwList = keywordText
@@ -307,13 +307,20 @@ function scrape(doc, url) {
 			if (keywords.size) {
 				item.tags = [...keywords];
 			}
+			let keywordCitation = doc.querySelectorAll('meta[name="DC.Subject"]');
+			keywordCitation.forEach(meta => {
+				let content = meta.getAttribute('content');
+				if (content) {
+					item.tags.push(content);
+				}
+			});
 			function extractAbstract(text, labels, allLabels) {
 				const labelPattern = labels.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
 				const lookaheadPattern = allLabels
 					.map(label => label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
 					.join('|');
 				const regex = new RegExp(
-					`(?:\\n|^|\\s*)(${labelPattern}):?\\s*([\\s\\S]*?)(?=\\s*(?:${lookaheadPattern}):?|$)`, 'i');
+					`(?:\\n|^|\\s*)(${labelPattern}):?\\s*([\\s\\S]*?)(?=\\s*(?:${lookaheadPattern}):?|$)`);
 				const match = text.match(regex);
 				if (match) {
 					const content = match[2].trim();
@@ -323,11 +330,11 @@ function scrape(doc, url) {
 				}
 				return { content: '', text };
 			}
-			const allAbstractLabels = ['Abstract', 'Asbtract', 'Resumen', 'Resúmen', 'Resumo'];
+			const allAbstractLabels = ['Abstracts','Abstract', 'Asbtract', 'Resumen', 'Resúmen', 'Resumo'];
 			const abstractLabelGroups = [
-				['Resumo'],
+				['Resumo', 'Síntese'],
 				['Resumen', 'Resúmen'],
-				['Abstract', 'Asbtract']
+				['Abstracts','Abstract', 'Asbtract']
 			];
 			let allAbstracts = [];
 			for (const labelGroup of abstractLabelGroups) {
@@ -458,7 +465,7 @@ function scrape(doc, url) {
 			item.tags = newTags;
 		}
 
-		if (item.ISSN == '1988-4265') {
+		if (['1988-4265','2660-9541'].includes(item.ISSN)) {
 			keywordEntries = doc.querySelectorAll('meta[name="citation_keywords"]');
 			if (keywordEntries.length > 0) {
 				item.tags = [...keywordEntries].map(keyword => keyword.content);

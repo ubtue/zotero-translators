@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-05 10:49:18"
+	"lastUpdated": "2025-09-17 09:40:51"
 }
 
 /*
@@ -148,7 +148,7 @@ function scrape(doc, url) {
  		if (multiIssue) {
  			item.issue = multiIssue.split('Fasc.')[1].split(',')[0].trim();
  		}
-		if (item.issue) {
+		if (!item. ISSN == '2660-9541' && item.issue) {
 			if (item.issue === item.volume) delete item.issue;
 		}
 
@@ -185,6 +185,19 @@ function scrape(doc, url) {
 			}
 		}
 		if (!item.tags.includes('Book Review')) delete item.tags;
+		if (item.ISSN = '2660-9541') {
+			if (!item.tags)
+				item.tags = []
+			nonKeywords = [item.title, 'Article', 'Artículo']
+			keywordsPath = doc.querySelector('meta[name="keywords"]')
+			if (keywordsPath) {
+				keywords = keywordsPath.content.split(/[,;]+/);
+				for (keyword in keywords) {
+					if (!nonKeywords.includes(keywords[keyword].trim()))
+						item.tags.push(keywords[keyword].trim())
+				}
+			}
+		}
 		item.attachments = [];
 		item.complete();
 	});
