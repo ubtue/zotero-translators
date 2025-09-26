@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-26 10:52:19"
+	"lastUpdated": "2025-09-26 13:13:10"
 }
 
 /*
@@ -116,8 +116,8 @@ function normaliseTitle(title) {
 	if (title) {
 		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ']{2,}[\.\s\?:;,'\(\)]*)+))*(.*)/)
 		if (!match) return title;
-		let upperTitle = match[1].trim();
-		let rest = match[3].trim();
+		let upperTitle = match[1]? match[1].trim() : '';
+		let rest = match[3]? match[3].trim() : '';
 		let capitalized = ZU.capitalizeTitle(upperTitle, true);
 		return capitalized + (rest ? " " + rest : "");
 	}
