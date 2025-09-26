@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-24 12:56:21"
+	"lastUpdated": "2025-09-26 10:52:19"
 }
 
 /*
@@ -69,6 +69,8 @@ function addBookReviewTag(doc, item) {
 	var primaryHeading = ZU.xpathText(doc, '//span[@class="primary-heading"]');
 	if (primaryHeading.match(/Book Review\b|Review Essays?|Reviews?\b|Book Discussion\b|Criticism of Current Literature/i)) {
 		item.tags.push('Book Review');
+	} else if (item.abstractNote && item.abstractNote.startsWith('Book reviewed in this article')) {
+		item.tags.push('Book Review');
 	}
 }
 
@@ -102,7 +104,7 @@ function handleErroneousReviewTitles(doc, item) {
 		if (!websiteTitle) {
 			return;
 		}
-		if (websiteTitle.match(/^\s*((?:[A-Z][A-Z\.]{2,}(?:\s+|$)))(.*)/)) {
+		if (websiteTitle.match(/^\s*((?:[A-Z]{2,}(?:[\s+|,|']|$)))(.*)/)) {
 			item.title = normaliseTitle(websiteTitle)
 			return;
 		}
@@ -112,7 +114,7 @@ function handleErroneousReviewTitles(doc, item) {
 
 function normaliseTitle(title) {
 	if (title) {
-		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ]{2,}[\.\s:;,\(\)]*)+))*(.*)/)
+		let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ']{2,}[\.\s\?:;,'\(\)]*)+))*(.*)/)
 		if (!match) return title;
 		let upperTitle = match[1].trim();
 		let rest = match[3].trim();
