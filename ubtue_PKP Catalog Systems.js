@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-25 11:29:23"
+	"lastUpdated": "2025-10-06 11:46:54"
 }
 
 /*
@@ -469,6 +469,34 @@ function scrape(doc, url) {
 			keywordEntries = doc.querySelectorAll('meta[name="citation_keywords"]');
 			if (keywordEntries.length > 0) {
 				item.tags = [...keywordEntries].map(keyword => keyword.content);
+			}
+		}
+
+		if (item.ISSN == "2246-6282") {
+			if (!item.abstractNote) {
+				const descriptions = Array.from(doc.querySelectorAll('meta[name="DC.Description"]'))
+					.map(meta => meta.getAttribute('content').trim())
+					.filter(content => content);
+
+				if (descriptions.length > 0) {
+					item.abstractNote = descriptions[0];
+					if (descriptions.length > 1) {
+						item.notes.push({
+							note: `abs:${descriptions[1]}`
+						});
+					}
+				}
+			}
+			let articleType = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content');
+			let title = item.title ? item.title.toLowerCase() : '';
+			if ((articleType === 'Grundtvig-litteratur' && title.toLowerCase().includes("anmeldelser")) ||
+				articleType === 'Fra Grundtvig-litteraturen') {
+				item.tags.push("Book Review");
+			} else if (articleType === 'Grundtvig-litteratur') {
+				item.tags.push("Bibliografie");
+			}
+			if (title.includes("in memoriam")) {
+				item.tags.push("Nachruf");
 			}
 		}
 
