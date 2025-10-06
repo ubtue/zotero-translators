@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-06 11:46:54"
+	"lastUpdated": "2025-10-06 12:13:38"
 }
 
 /*
@@ -495,9 +495,6 @@ function scrape(doc, url) {
 			} else if (articleType === 'Grundtvig-litteratur') {
 				item.tags.push("Bibliografie");
 			}
-			if (title.includes("in memoriam")) {
-				item.tags.push("Nachruf");
-			}
 		}
 
 		if (item.pages && item.pages.startsWith('e')) {
@@ -508,6 +505,11 @@ function scrape(doc, url) {
 		if (item.issue) {
 			item.issue = item.issue.replace("-", "/");
 		}
+
+		let title = item.title ? item.title.toLowerCase() : '';
+		if (title.includes("in memoriam")) {
+				item.tags.push("Nachruf");
+			}
 
 		let article_type = ZU.xpathText(doc, '//meta[@name="DC.Type.articleType"]/@content')
 		if (article_type && article_type.match(/(Recensioni)|(Recensiones)|(Buchbesprechungen)|(Book Review)/i))
