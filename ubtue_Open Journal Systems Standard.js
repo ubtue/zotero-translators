@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-09-25 11:10:57"
+	"lastUpdated": "2025-10-07 06:45:37"
 }
 
 /*
@@ -343,6 +343,12 @@ function invokeUbtuePKPTranslator(doc) {
 					i.notes.push({note: "no_pdf:Artikelseite enthält keinen Volltext"});
 				}
 			}
+		}
+
+		if (i.ISSN == "2605-3012") {
+			let additionalTitle = ZU.xpathText(doc, '//meta[@name="DC.Title"]/@content');
+			if (additionalTitle && additionalTitle != i.title)
+				i.notes.push( { note: "additional_title:" + additionalTitle });
 		}
 
 		if (['2617-3697', '2660-4418', '2748-6419', '1988-3269', '2699-8440',
