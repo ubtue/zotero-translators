@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-06 12:13:38"
+	"lastUpdated": "2025-10-08 09:50:56"
 }
 
 /*
@@ -145,6 +145,19 @@ function normaliseTitle(title) {
 		let capitalized = ZU.capitalizeTitle(upperTitle, true);
 		return capitalized + (rest ? " " + rest : "");
 	}
+}
+
+function deduplicateKeywords(item) {
+	let keywordsSeen = new Set();
+	let deduplicatedTags = [];
+	for (let tag of item.tags) {
+		let normalized = tag.toLowerCase().replace(/\.$/, '');
+		if (!keywordsSeen.has(normalized)) {
+			keywordsSeen.add(normalized);
+			deduplicatedTags.push(ZU.capitalizeTitle(tag, true));
+		}
+	}
+	item.tags = deduplicatedTags;
 }
 
 function scrape(doc, url) {
@@ -496,6 +509,8 @@ function scrape(doc, url) {
 				item.tags.push("Bibliografie");
 			}
 		}
+
+		deduplicateKeywords(item);
 
 		if (item.pages && item.pages.startsWith('e')) {
 			item.notes.push("articleid:" + item.pages);
