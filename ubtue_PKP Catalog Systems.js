@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-09 09:39:51"
+	"lastUpdated": "2025-10-09 12:35:44"
 }
 
 /*
@@ -310,19 +310,6 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (['2317-4307', '1980-6736', '2237-6461', '2595-5977', '1988-4265'].includes(item.ISSN)) {
-			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas', 'Recensões'];
-			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
-			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
-				item.tags.push({ tag: "Book Review" });
-			if (item.abstractNote && item.abstractNote == "---") item.abstractNote = ''
-			for (let i = item.tags.length - 1; i >= 0; i--) {
-				if (item.tags[i] === "---") {
-					item.tags.splice(i, 1);
-				}
-			}
-		}
-
 		if (['2595-5977', '1980-6736', '2175-5841'].includes(item.ISSN)) {
 			let rawDescription = item.abstractNote.replace(/-?\s*DOI:\s*.*$/i, '').trim();
 			let keywords = new Set();
@@ -498,14 +485,14 @@ function scrape(doc, url) {
 			item.tags = newTags;
 		}
 
-		if (['1988-4265','2660-9541'].includes(item.ISSN)) {
+		if (['1988-4265','2660-9541', '1678-6408'].includes(item.ISSN)) {
 			keywordEntries = doc.querySelectorAll('meta[name="citation_keywords"]');
 			if (keywordEntries.length > 0) {
 				item.tags = [...keywordEntries].map(keyword => keyword.content);
 			}
 		}
 
-		if (item.ISSN == "2246-6282") {
+		if (["2246-6282", "1678-6408"].includes(item.ISSN)) {
 			if (!item.abstractNote) {
 				const descriptions = Array.from(doc.querySelectorAll('meta[name="DC.Description"]'))
 					.map(meta => meta.getAttribute('content').trim())
@@ -549,6 +536,19 @@ function scrape(doc, url) {
 			item.creators = item.creators
 				.map(cleanAuthorName)
 				.filter(creator => creator !== null && (creator.firstName || creator.lastName));
+		}
+
+		if (['2317-4307', '1980-6736', '2237-6461', '2595-5977', '1988-4265', '1678-6408'].includes(item.ISSN)) {
+			const reviewTypes = ['Resenha', 'Resenhas', 'Review', 'Reseñas', 'Recensões e Resenhas', 'Recensões', 'RESUMOS E RESENHAS'];
+			let articleTypePath = doc.querySelector('li.current[aria-current="page"] > span[aria-current="page"]');
+			if (articleTypePath && reviewTypes.includes(articleTypePath.textContent.trim()))
+				item.tags.push("Book Review");
+			if (item.abstractNote && item.abstractNote == "---") item.abstractNote = '';
+			for (let i = item.tags.length - 1; i >= 0; i--) {
+				if (item.tags[i] === "---") {
+					item.tags.splice(i, 1);
+				}
+			}
 		}
 
 		deduplicateKeywords(item);
