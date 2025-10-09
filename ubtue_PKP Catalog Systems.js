@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-08 09:50:56"
+	"lastUpdated": "2025-10-09 09:39:51"
 }
 
 /*
@@ -118,11 +118,31 @@ function cleanAuthorName(creator) {
 		if (fullName) fullName += ", ";
 		fullName += creator.lastName;
 	}
-
-	fullName = fullName.replace(/\b(L\.?,?\s*C\.?|Msc)\b/gi, '').trim();
-	fullName = fullName.replace(/^\s*,\s*/, '').replace(/\s*,\s*$/, '').replace(/\s{2,}/g, ' ');
+	fullName = fullName.replace(/\b(S\.?\s?J\.?|Ph\.?D\.?|Msc|L\.?\s*C\.?)\.?,?/gi, '').trim();
+	fullName = fullName.replace(/^[,.\s]+|[,.\s]+$/g, '').replace(/\s{2,}/g, ' ');
 	if (!fullName) return null;
 
+	let nameParts = fullName.trim().split(/\s+/);
+	if (nameParts.length >= 3) {
+		let last = nameParts[nameParts.length - 1];
+		if (/^[A-Z]\.?$/i.test(last)) {
+			let lastName = nameParts.slice(-2).join(' ');
+			let firstName = nameParts.slice(0, -2).join(' ');
+			return {
+				firstName,
+				lastName,
+				creatorType: "author"
+			};
+		} else {
+			let lastName = nameParts.pop();
+			let firstName = nameParts.join(' ');
+			return {
+				firstName,
+				lastName,
+				creatorType: "author"
+			};
+		}
+	}
 	return ZU.cleanAuthor(fullName, "author");
 }
 
@@ -508,6 +528,27 @@ function scrape(doc, url) {
 			} else if (articleType === 'Grundtvig-litteratur') {
 				item.tags.push("Bibliografie");
 			}
+		}
+
+		if (item.ISSN == '2001-5828') {
+			breadcrumbs = ZU.xpathText(doc, '//nav[@class="cmp_breadcrumbs"]/ol/li');
+			if (breadcrumbs && !item.issue) {
+				breadcrumbs = breadcrumbs.replace(/\s+/g, ' ').trim();
+				Z.debug(breadcrumbs)
+				let match = breadcrumbs.match(/Häfte\s?\d+(-\d+)?/i);
+				if (match) {
+					if (match[0]) item.issue = match[0].replace('Häfte ', '');
+				}
+			}
+			if (item.title && item.abstractNote && item.abstractNote.includes(item.title)) {
+				item.abstractNote='';
+			}
+		}
+
+		if (item.ISSN == "2011-219X") {
+			item.creators = item.creators
+				.map(cleanAuthorName)
+				.filter(creator => creator !== null && (creator.firstName || creator.lastName));
 		}
 
 		deduplicateKeywords(item);
