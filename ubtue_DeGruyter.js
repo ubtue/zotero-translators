@@ -2,14 +2,14 @@
 	"translatorID": "9ef1752e-bd32-49bb-9d9b-f06c039712ab",
 	"label": "ubtue_DeGruyter",
 	"creator": "Timotheus Kim",
-	"target": "^https?://www\\.degruyter\\.com",
+	"target": "^https?://www[.]degruyter(brill)?[.]com",
 	"minVersion": "3.0",
 	"maxVersion": "",
 	"priority": 80,
-	"inRepository": false,
+	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2021-11-24 10:24:32"
+	"lastUpdated": "2025-10-10 07:43:49"
 }
 
 /*
@@ -36,7 +36,7 @@
 */
 
 function detectWeb(doc, url) {
-	if (url.includes('/article/')) return "journalArticle";
+	if (url.includes('/article/') || url.includes('/document/')) return "journalArticle";
 	else if (url.match(/issue/) && getSearchResults(doc)) return "multiple";
 	else return false;
 }
@@ -80,6 +80,17 @@ function invokeEMTranslator(doc) {
 	translator.setHandler("itemDone", function (t, i) {
 		if (i.title.match(/ISBN/)) i.tags.push('Book Review') && delete i.abstractNote;
 		if (i.abstractNote) i.abstractNote += ZU.xpathText(doc, '//*[(@id = "transAbstract")]//p');
+		for (let authorTag of ZU.xpath(doc, '//span[contains(@class, "contributor")]')) {
+			let orcidRegex = /\d+-\d+-\d+-\d+x?/i;
+			if (authorTag != null && authorTag.innerHTML.match(orcidRegex)) {
+				let authorname = ZU.xpath(authorTag, '//span[@class ="displayName linkAnimation"]')
+				let name = (authorname != null && authorname.length) ? authorname[0].innerText : authorTag.innerText;
+				let orcid = authorTag.innerHTML.match(orcidRegex);
+				i.notes.push({note:'orcid:' + orcid + ' | '+ name});
+			}
+		}
+		i.volume = i.volume.replace(/^0+/, '').replace(/[-–‑]/g, '/');
+		i.issue = i.issue.replace(/^0+/, '').replace(/[-–‑]/g, '/');
 		// mark articles as "LF" (MARC=856 |z|kostenfrei), that are published as open|free access
 		let openAccessTag = text(doc, '.accessOpenAccess');
 		if (openAccessTag && openAccessTag.match(/(free|freier)\s+(access|zugang)/gi)) i.notes.push('LF:');
@@ -87,6 +98,7 @@ function invokeEMTranslator(doc) {
 	});
 	translator.translate();
 }
+
 /** BEGIN TEST CASES **/
 var testCases = [
 	{
