@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-09 12:35:44"
+	"lastUpdated": "2025-10-13 08:17:25"
 }
 
 /*
@@ -456,7 +456,7 @@ function scrape(doc, url) {
 			breadcrumbs = ZU.xpathText(doc, '//ol[@class="breadcrumb"]');
 			if (breadcrumbs && !item.volume) {
 				breadcrumbs = breadcrumbs.replace(/\s+/g, ' ').trim();
-				let match = breadcrumbs.match(/v(?:ol)?\.?\s*[:.]?\s*(\d+)[,\s]+n(?:[º°]|\.)?\.?\s*[:.]?\s*(\d+)/i);
+				let match = breadcrumbs.match(/v(?:ol)?\.?\s*[:.]?\s*(\d+)[,\s]+n(?:[º°]|o?\.)?\.?\s*[:.]?\s*(\d+)/i);
 				if (match) {
 					if (match[1]) item.volume = match[1];
 					if (match[2]) item.issue = match[2];

@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-10 11:57:29"
+	"lastUpdated": "2025-10-13 13:37:17"
 }
 
 /*
@@ -115,6 +115,9 @@ function scrape(doc, url) {
 				item.notes.push({note: "orcid: " + orcid + " | " + author});
 			}
 		}
+		let firstPage = ZU.xpathText(doc, '//meta[@name="citation_firstpage"]/@content')
+		let lastPage = ZU.xpathText(doc, '//meta[@name="citation_lastpage"]/@content')
+		if (firstPage == lastPage) item.pages = firstPage;
 		item.attachments = [];
 		addOpenAccessTag(doc, item);
 		item.complete();
