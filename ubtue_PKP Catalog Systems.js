@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-13 08:17:25"
+	"lastUpdated": "2025-10-16 11:52:26"
 }
 
 /*
@@ -310,7 +310,7 @@ function scrape(doc, url) {
 			}
 		}
 
-		if (['2595-5977', '1980-6736', '2175-5841'].includes(item.ISSN)) {
+		if (['2595-5977', '1980-6736', '2175-5841', '2605-3012'].includes(item.ISSN)) {
 			let rawDescription = item.abstractNote.replace(/-?\s*DOI:\s*.*$/i, '').trim();
 			let keywords = new Set();
 			const keywordRegex = /(?:Keywords|Key words|Palabras[\s|-]clave|Palavras\-chaves?):\s*([\s\S]*?)(?=\s*(?:Abstract|Asbtract|Resumo|Resúmen|Resumen|Summary|-?\sDOI:|$))/g;
@@ -550,6 +550,9 @@ function scrape(doc, url) {
 				}
 			}
 		}
+
+		if (item.ISSN == '2605-3012' && item.abstractNote.startsWith("Es recensión de:"))
+			item.tags.push("Book Review");
 
 		deduplicateKeywords(item);
 

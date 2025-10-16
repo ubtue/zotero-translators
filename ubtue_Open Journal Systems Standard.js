@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-13 14:00:52"
+	"lastUpdated": "2025-10-16 11:44:40"
 }
 
 /*
@@ -117,7 +117,7 @@ function getOrcids(doc, ISSN) {
   	 // e.g. https://jeac.de/ojs/index.php/jeac/article/view/844
   	 // e.g. https://jebs.eu/ojs/index.php/jebs/article/view/336
   	 // e.g. https://bildungsforschung.org/ojs/index.php/beabs/article/view/783
-	 if (['2627-6062', '1804-6444', '2748-6419', '1018-1539', '2175-5841'].includes(ISSN)) {
+	 if (['2627-6062', '1804-6444', '2748-6419', '1018-1539', '2175-5841', '2605-3012'].includes(ISSN)) {
   	 	let orcidAuthorEntryCaseA = doc.querySelectorAll('.authors');
   	 	if (orcidAuthorEntryCaseA) {
   		for (let a of orcidAuthorEntryCaseA) {
@@ -346,12 +346,13 @@ function invokeUbtuePKPTranslator(doc) {
 		}
 
 		if (["2605-3012","2013-4010", "2011-219X", "2708-8960"].includes(i.ISSN)) {
+			const clean = str => str.normalize("NFC").replace(/\s+/g, " ").trim();
 			let additionalTitle = ZU.xpathText(doc, '//meta[@name="DC.Title"]/@content');
 			let alternativeTitle = ZU.xpathText(doc, '//meta[@name="DC.Title.Alternative"]/@content');
-			if (additionalTitle && additionalTitle.trim() != i.title)
-				i.notes.push( { note: "additional_title:" + additionalTitle });
-			else if (alternativeTitle && alternativeTitle.trim() != i.title)
-				i.notes.push( { note: "additional_title:" + alternativeTitle });
+			if (additionalTitle && clean(additionalTitle) != clean(i.title))
+				i.notes.push( { note: "additional_title:" + clean(additionalTitle) });
+			else if (alternativeTitle && clean(alternativeTitle) != clean(i.title))
+				i.notes.push( { note: "additional_title:" + clean(alternativeTitle) });
 		}
 
 		if (['2617-3697', '2660-4418', '2748-6419', '1988-3269', '2699-8440',
