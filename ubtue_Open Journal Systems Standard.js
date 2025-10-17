@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-16 11:44:40"
+	"lastUpdated": "2025-10-17 09:39:40"
 }
 
 /*
@@ -345,8 +345,8 @@ function invokeUbtuePKPTranslator(doc) {
 			}
 		}
 
-		if (["2605-3012","2013-4010", "2011-219X", "2708-8960"].includes(i.ISSN)) {
-			const clean = str => str.normalize("NFC").replace(/\s+/g, " ").trim();
+		if (["2605-3012","2013-4010", "2011-219X", "2708-8960", "1678-6408"].includes(i.ISSN)) {
+			const clean = str => ZU.capitalizeTitle(str, true).normalize("NFC").replace(/\s+/g, " ").trim();
 			let additionalTitle = ZU.xpathText(doc, '//meta[@name="DC.Title"]/@content');
 			let alternativeTitle = ZU.xpathText(doc, '//meta[@name="DC.Title.Alternative"]/@content');
 			if (additionalTitle && clean(additionalTitle) != clean(i.title))
