@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-13 13:37:17"
+	"lastUpdated": "2025-10-22 12:26:51"
 }
 
 /*
@@ -87,6 +87,17 @@ function addOpenAccessTag (doc, item) {
 	}
 }
 
+function normaliseTitle(title) {
+        if (title) {
+                let match = title.match(/^(\s*((?:[A-ZÀ-ÖØ-Þ']{2,}[\.\s\?:;,'\(\)]*)+))*(.*)/)
+                if (!match) return title;
+                let upperTitle = match[1]? match[1].trim() : '';
+                let rest = match[3]? match[3].trim() : '';
+                let capitalized = ZU.capitalizeTitle(upperTitle, true);
+                return capitalized + (rest ? " " + rest : "");
+        }
+}
+
 function scrape(doc, url) {
 	var translator = Zotero.loadTranslator('web');
 	// Embedded Metadata
@@ -118,6 +129,7 @@ function scrape(doc, url) {
 		let firstPage = ZU.xpathText(doc, '//meta[@name="citation_firstpage"]/@content')
 		let lastPage = ZU.xpathText(doc, '//meta[@name="citation_lastpage"]/@content')
 		if (firstPage == lastPage) item.pages = firstPage;
+		if (normaliseTitle(item.title)) item.title = normaliseTitle(item.title);
 		item.attachments = [];
 		addOpenAccessTag(doc, item);
 		item.complete();

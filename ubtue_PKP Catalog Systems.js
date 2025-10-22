@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-16 11:52:26"
+	"lastUpdated": "2025-10-20 13:48:26"
 }
 
 /*
@@ -170,13 +170,24 @@ function normaliseTitle(title) {
 function deduplicateKeywords(item) {
 	let keywordsSeen = new Set();
 	let deduplicatedTags = [];
-	for (let tag of item.tags) {
+
+	for (let tagEntry of item.tags) {
+		let tag;
+		if (typeof tagEntry === 'string') {
+			tag = tagEntry;
+		} else if (typeof tagEntry === 'object' && tagEntry.tag) {
+			tag = tagEntry.tag;
+		} else {
+			continue;
+		}
+
 		let normalized = tag.toLowerCase().replace(/\.$/, '');
 		if (!keywordsSeen.has(normalized)) {
 			keywordsSeen.add(normalized);
-			deduplicatedTags.push(ZU.capitalizeTitle(tag, true));
+			deduplicatedTags.push({ tag: ZU.capitalizeTitle(tag, true) });
 		}
 	}
+
 	item.tags = deduplicatedTags;
 }
 
