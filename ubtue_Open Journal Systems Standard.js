@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-10-17 09:39:40"
+	"lastUpdated": "2025-10-24 12:31:32"
 }
 
 /*
@@ -117,20 +117,24 @@ function getOrcids(doc, ISSN) {
   	 // e.g. https://jeac.de/ojs/index.php/jeac/article/view/844
   	 // e.g. https://jebs.eu/ojs/index.php/jebs/article/view/336
   	 // e.g. https://bildungsforschung.org/ojs/index.php/beabs/article/view/783
-	 if (['2627-6062', '1804-6444', '2748-6419', '1018-1539', '2175-5841', '2605-3012'].includes(ISSN)) {
+	 if (['2627-6062', '1804-6444', '2748-6419', '1018-1539', '2175-5841', '2605-3012', '2665-3834'].includes(ISSN)) {
   	 	let orcidAuthorEntryCaseA = doc.querySelectorAll('.authors');
   	 	if (orcidAuthorEntryCaseA) {
   		for (let a of orcidAuthorEntryCaseA) {
-  			let name_to_orcid = {};
+			//let name_to_orcid = {};
   			let tgs = ZU.xpath(a, './/*[self::strong or self::a]');
   			let tg_nr = 0;
   			for (let t of tgs) {
   				if (t.textContent.match(/orcid/) != null) {
-  					name_to_orcid[tgs[tg_nr -1].textContent] = t.textContent.trim();
-  					let author = ZU.unescapeHTML(ZU.trimInternal(tgs[tg_nr -1].textContent)).trim();
-  					let orcid = ZU.unescapeHTML(ZU.trimInternal(t.textContent)).trim();
-  					notes.push({note: orcid.replace(/https?:\/\/orcid.org\//g, 'orcid:') + ' | ' + author});
-  				}
+					let orcidUrl = t.href ? t.href.trim() : t.textContent.trim();
+					let orcid = orcidUrl.replace(/https?:\/\/orcid\.org\//i, 'orcid:');
+					let author = ZU.unescapeHTML(ZU.trimInternal(tgs[tg_nr - 1].textContent)).trim();
+					notes.push({ note: `${orcid} | ${author}` });
+					//name_to_orcid[tgs[tg_nr -1].textContent] = t.textContent.trim();
+					//let author = ZU.unescapeHTML(ZU.trimInternal(tgs[tg_nr -1].textContent)).trim();
+					//let orcid = ZU.unescapeHTML(ZU.trimInternal(t.textContent)).trim();
+					//notes.push({note: orcid.replace(/https?:\/\/orcid.org\//g, 'orcid:') + ' | ' + author});
+				}
   				tg_nr += 1;
   			}
   		}
