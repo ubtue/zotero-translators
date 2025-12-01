@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-19 14:31:02"
+	"lastUpdated": "2025-12-01 12:56:22"
 }
 
 /*
@@ -108,6 +108,32 @@ function isOpenAccess(doc) {
 	return false;
 }
 
+function fixIssue(doc, item) {
+	// Issue is missing in the metadata e.g. for 2153-9650
+	// Issue is partly wron the metadata in 1703-289X
+	designation = ZU.xpathText(doc, '//*[@class="designation"]');
+	let issueMatch = /(?:Number\s+)(?<issue>\d+(?:-\d+))/i;
+	let issue = issueMatch.exec(designation)?.groups?.issue;
+	if (issue?.length > item?.issue?.length)
+	    return issue.replace('-', '/');
+	return item.issue;	
+}
+
+
+function fixAuthors(doc, item) {
+	let unprintable = /[\x00-\x1F\x7F-\x9F\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E\u2060-\u2064\u2065-\u2069\uD800-\uDFFF\uFFF0-\uFFFF]/u;
+	if (item.creators.filter(obj => Object.values(obj).some(
+		     value => typeof value == 'string' && unprintable.test(value) ))) {
+        webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
+	    item.creators = [];
+		for (webAuthor of webAuthors) {
+			 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent));
+		}
+	    return item.creators;	  
+	}
+    return item.creators;
+}
+
 
 function scrape(doc) {
 	// Embedded Metadata
@@ -115,6 +141,7 @@ function scrape(doc) {
 	translator.setTranslator("951c027d-74ac-47d4-a107-9c3069ab7b48");
 	translator.setDocument(doc);
 	translator.setHandler("itemDone", function (obj, item) {
+		item.creators = fixAuthors(doc, item);
 		let abstract = ZU.xpathText(doc, '//div[@class="abstract"][1]/p');
 		if (!abstract) abstract = ZU.xpathText(doc, '//div[@class="description"][1]');
 		if (!abstract) abstract = ZU.xpathText(doc, '//div[contains(@class, "card_summary") and contains(@class, "no_border")]');
@@ -152,13 +179,7 @@ function scrape(doc) {
 
 		});
 
-		// Issue is missing in the metadata e.g. for 2153-9650
-		if (!item.issue) {
-			designation = ZU.xpathText(doc, '//*[@class="designation"]');
-			let issueMatch = /(?:Number\s+)(?<issue>\d+)/i;
-			item.issue = issueMatch.exec(designation)?.groups?.issue;
-		}
-
+		item.issue = fixIssue(doc, item);
 		item.date = ZU.xpathText(doc, '//meta[@name="citation_year"]/@content');
 	});
 	translator.translate();
