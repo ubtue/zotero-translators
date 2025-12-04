@@ -9,13 +9,13 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-12-02 14:38:19"
+	"lastUpdated": "2025-12-04 14:23:24"
 }
 
 /*
 	***** BEGIN LICENSE BLOCK *****
 
-	Copyright © 2025 YOUR_NAME <- TODO
+	Copyright © 2025 Universität Tübingen
 	
 	This file is part of Zotero.
 
@@ -86,7 +86,7 @@ async function doWeb(doc, url) {
     }
 }
 
-function scrape(data) {
+async function scrape(data) {
 	let itemType = data.itemType || "journalArticle";
 	let item = new Zotero.Item(itemType);
 	const simpleFields = [
@@ -123,7 +123,7 @@ function scrape(data) {
 	let newTags = [];
 	if (Array.isArray(data.tags)) {
 		newTags = data.tags.filter(t => typeof t === 'object' ? t.tag !== "Book Review" && t.tag !== "Reviews" : t !== "Book Review" && t !== "Reviews");
-		if (data.tags.includes("Book Review") || data.tags.includes("Reviews")) {
+		if (data.tags.some(t => (typeof t === 'object' && t.tag === "Book Review") || t === "Book Review")) {
 			newTags.push({ tag: "Book Review" });
 		}
 		item.tags = newTags.map(t => (typeof t === 'object' && t.tag) ? t : { tag: t });
@@ -142,7 +142,7 @@ function scrape(data) {
 		item.notes.push({ note: 'orcid:' + orcidID + ' ' + ' | ' + ' ' + creatorName });
 	}
 
-	item.complete();
+	await item.complete();
 }
 
 /** BEGIN TEST CASES **/
