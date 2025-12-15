@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-12-01 12:56:22"
+	"lastUpdated": "2025-12-15 12:01:32"
 }
 
 /*
@@ -115,7 +115,7 @@ function fixIssue(doc, item) {
 	let issueMatch = /(?:Number\s+)(?<issue>\d+(?:-\d+))/i;
 	let issue = issueMatch.exec(designation)?.groups?.issue;
 	if (issue?.length > item?.issue?.length)
-	    return issue.replace('-', '/');
+		return issue.replace('-', '/');
 	return item.issue;	
 }
 
@@ -123,15 +123,15 @@ function fixIssue(doc, item) {
 function fixAuthors(doc, item) {
 	let unprintable = /[\x00-\x1F\x7F-\x9F\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E\u2060-\u2064\u2065-\u2069\uD800-\uDFFF\uFFF0-\uFFFF]/u;
 	if (item.creators.filter(obj => Object.values(obj).some(
-		     value => typeof value == 'string' && unprintable.test(value) ))) {
-        webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
-	    item.creators = [];
+			 value => typeof value == 'string' && unprintable.test(value) ))?.length !== 0) {
+		webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
+		item.creators = [];
 		for (webAuthor of webAuthors) {
 			 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent));
 		}
-	    return item.creators;	  
+		return item.creators;  
 	}
-    return item.creators;
+	return item.creators;
 }
 
 
