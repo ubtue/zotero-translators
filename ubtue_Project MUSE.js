@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-12-15 12:01:32"
+	"lastUpdated": "2026-01-21 16:52:14"
 }
 
 /*
@@ -135,6 +135,17 @@ function fixAuthors(doc, item) {
 }
 
 
+function getOrcids(doc, item) {
+	let webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
+	for (webAuthor of webAuthors) {
+		let author = webAuthor?.textContent?.trim()
+		let orcid = ZU.xpath(webAuthor, '//a[@class="orcid_link"]')?.[0]?.href?.replace(/.*(\d{4}-\d+-\d+-\d+x?)$/i, '$1');
+		if (author && orcid)
+		    item.notes.push({note: "orcid:" + orcid + ' | ' + author});
+	}
+}
+
+
 function scrape(doc) {
 	// Embedded Metadata
 	let translator = Zotero.loadTranslator('web');
@@ -142,6 +153,7 @@ function scrape(doc) {
 	translator.setDocument(doc);
 	translator.setHandler("itemDone", function (obj, item) {
 		item.creators = fixAuthors(doc, item);
+		getOrcids(doc, item);
 		let abstract = ZU.xpathText(doc, '//div[@class="abstract"][1]/p');
 		if (!abstract) abstract = ZU.xpathText(doc, '//div[@class="description"][1]');
 		if (!abstract) abstract = ZU.xpathText(doc, '//div[contains(@class, "card_summary") and contains(@class, "no_border")]');
