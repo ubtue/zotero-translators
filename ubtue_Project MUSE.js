@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-01-21 16:52:14"
+	"lastUpdated": "2026-02-05 16:21:12"
 }
 
 /*
@@ -121,27 +121,22 @@ function fixIssue(doc, item) {
 
 
 function fixAuthors(doc, item) {
-	let unprintable = /[\x00-\x1F\x7F-\x9F\u200B-\u200D\uFEFF\u200E\u200F\u202A-\u202E\u2060-\u2064\u2065-\u2069\uD800-\uDFFF\uFFF0-\uFFFF]/u;
-	if (item.creators.filter(obj => Object.values(obj).some(
-			 value => typeof value == 'string' && unprintable.test(value) ))?.length !== 0) {
-		webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
-		item.creators = [];
-		for (webAuthor of webAuthors) {
-			 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent));
-		}
-		return item.creators;  
+	webAuthors = ZU.xpath(doc, '//li[@class="authors"] | //div[@class="author"]/div/a');
+	item.creators = [];
+	for (webAuthor of webAuthors) {
+		 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent));
 	}
-	return item.creators;
+	return item.creators;  
 }
 
 
 function getOrcids(doc, item) {
-	let webAuthors = ZU.xpath(doc, '//li[@class="authors"]');
+	let webAuthors = ZU.xpath(doc, '//li[@class="authors"] | //div[@class="author"]/div/a');
 	for (webAuthor of webAuthors) {
 		let author = webAuthor?.textContent?.trim()
 		let orcid = ZU.xpath(webAuthor, '//a[@class="orcid_link"]')?.[0]?.href?.replace(/.*(\d{4}-\d+-\d+-\d+x?)$/i, '$1');
 		if (author && orcid)
-		    item.notes.push({note: "orcid:" + orcid + ' | ' + author});
+			item.notes.push({note: "orcid:" + orcid + ' | ' + author});
 	}
 }
 
@@ -190,7 +185,6 @@ function scrape(doc) {
 			ris_translator.translate();
 
 		});
-
 		item.issue = fixIssue(doc, item);
 		item.date = ZU.xpathText(doc, '//meta[@name="citation_year"]/@content');
 	});
