@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-02-05 16:21:12"
+	"lastUpdated": "2026-02-11 16:35:45"
 }
 
 /*
@@ -124,7 +124,9 @@ function fixAuthors(doc, item) {
 	webAuthors = ZU.xpath(doc, '//li[@class="authors"] | //div[@class="author"]/div/a');
 	item.creators = [];
 	for (webAuthor of webAuthors) {
-		 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent));
+	     if (webAuthor?.textContent.startsWith("("))
+		     continue;
+		 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent, "author"));
 	}
 	return item.creators;  
 }
