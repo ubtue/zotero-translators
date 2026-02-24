@@ -187,7 +187,7 @@ function scrape(doc, url) {
 		if (match)
 			item.date = match[1];
 	}
-	// Check whether we hava an OA image (fragile)
+	// Check whether we have an OA image (fragile)
 	if (ZU.xpath(doc, '//a[contains(text(), "Download article")]/img[contains(@src, "open_access")]')?.length)
 	   item.notes.push('LF:');
 
