@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2022-11-16 12:38:57"
+	"lastUpdated": "2026-02-24 13:02:16"
 }
 
 /*
@@ -187,9 +187,13 @@ function scrape(doc, url) {
 		if (match)
 			item.date = match[1];
 	}
+	// Check whether we hava an OA image (fragile)
+	if (ZU.xpath(doc, '//a[contains(text(), "Download article")]/img[contains(@src, "open_access")]')?.length)
+	   item.notes.push('LF:');
+
+
 	item.complete();
 }
-
 
 /** BEGIN TEST CASES **/
 var testCases = [
