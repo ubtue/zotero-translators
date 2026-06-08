@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-02-11 16:35:45"
+	"lastUpdated": "2026-06-08 09:07:41"
 }
 
 /*
@@ -103,7 +103,7 @@ function isOpenAccess(doc) {
 		'//div[@id = "info_wrap"]//*[contains(text(), "Open Access")]/parent::div');
 	if (openAccessInfo && /Open Access Yes/i.test(ZU.trimInternal(openAccessInfo)))
 		return true;
-	if (ZU.xpathText(doc, '//div[@class="cell label"][contains(text(),"Open Access")]/following-sibling::div[contains(text(),"Yes")]'))
+	if (ZU.xpathText(doc, '//tr[@class="details_row"]/th[@class="cell label"][contains(text(),"Open Access")]/following-sibling::td[contains(text(),"Yes")]'))
 		return true;
 	return false;
 }
