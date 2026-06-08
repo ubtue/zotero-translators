@@ -103,7 +103,7 @@ function isOpenAccess(doc) {
 		'//div[@id = "info_wrap"]//*[contains(text(), "Open Access")]/parent::div');
 	if (openAccessInfo && /Open Access Yes/i.test(ZU.trimInternal(openAccessInfo)))
 		return true;
-	if (ZU.xpathText(doc, '//tr[@class="details_row"]/th[@class="cell label"][contains(text(),"Open Access")]/following-sibling::td[contains(text(),"Yes")]'))
+	if (ZU.xpathText(doc, '//*[self::div or self::th][contains(@class,"label") and contains(text(),"Open Access")]/following-sibling::*[contains(text(),"Yes")]'))
 		return true;
 	return false;
 }
