@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-06-08 09:07:41"
+	"lastUpdated": "2026-06-15 11:58:39"
 }
 
 /*
@@ -121,7 +121,7 @@ function fixIssue(doc, item) {
 
 
 function fixAuthors(doc, item) {
-	webAuthors = ZU.xpath(doc, '//li[@class="authors"] | //div[@class="author"]/div/a');
+	webAuthors = ZU.xpath(doc, '//li[starts-with(@class, "author")]//a | //div[@class="author"]/div/a');
 	item.creators = [];
 	for (webAuthor of webAuthors) {
 	     if (webAuthor?.textContent.startsWith("("))
@@ -133,7 +133,7 @@ function fixAuthors(doc, item) {
 
 
 function getOrcids(doc, item) {
-	let webAuthors = ZU.xpath(doc, '//li[@class="authors"] | //div[@class="author"]/div/a');
+	let webAuthors = ZU.xpath(doc, '//li[starts-with(@class, "author")]//a | //div[@class="author"]/div/a');
 	for (webAuthor of webAuthors) {
 		let author = webAuthor?.textContent?.trim()
 		let orcid = ZU.xpath(webAuthor, '//a[@class="orcid_link"]')?.[0]?.href?.replace(/.*(\d{4}-\d+-\d+-\d+x?)$/i, '$1');
