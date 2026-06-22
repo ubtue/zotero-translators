@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-06-15 11:58:39"
+	"lastUpdated": "2026-06-22 09:00:28"
 }
 
 /*
@@ -112,9 +112,9 @@ function fixIssue(doc, item) {
 	// Issue is missing in the metadata e.g. for 2153-9650
 	// Issue is partly wron the metadata in 1703-289X
 	designation = ZU.xpathText(doc, '//*[@class="designation"]');
-	let issueMatch = /(?:Number\s+)(?<issue>\d+(?:-\d+))/i;
+	let issueMatch = /(?:Number\s+)(?<issue>\d+(?:-\d+)?)/i;
 	let issue = issueMatch.exec(designation)?.groups?.issue;
-	if (issue?.length > item?.issue?.length)
+	if (issue?.length > (item.issue?.length ?? 0))
 		return issue.replace('-', '/');
 	return item.issue;	
 }
