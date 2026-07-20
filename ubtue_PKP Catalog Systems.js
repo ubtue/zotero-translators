@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-11-17 13:23:20"
+	"lastUpdated": "2026-07-20 14:37:19"
 }
 
 /*
@@ -128,8 +128,8 @@ function scrape(doc, url) {
 			// In some cases the author list in the metadata is incomplete, so double check
 			potentiallyAdditionalAuthorsString = doc.querySelector(".item.authors .authors");
 			// In some cases there is an additional affiliation (c.f. ubtue/DatenProbleme#2367)
-			if (potentiallyAdditionalAuthorsString.querySelector(".name")) {
-			    potentiallyAdditionalAuthorsString = potentiallyAdditionalAuthorsString.querySelector(".name");
+			if (potentiallyAdditionalAuthorsString?.querySelector(".name")) {
+				potentiallyAdditionalAuthorsString = potentiallyAdditionalAuthorsString.querySelector(".name");
 			}
 
 			if (potentiallyAdditionalAuthorsString) {
@@ -248,6 +248,11 @@ function scrape(doc, url) {
 			if (match = issue_information.match(/[(](\d{4})[)]/))
 				item.date = match[1];
 		}
+
+        // Address erroneous duplication of pages in embedded metadata
+		if (pages = item?.pages?.match(/(\d+)[-–](\d+)[-–]\1[-–]\2/));
+		    item.pages = pages[1] + '-' + pages[2];
+
 
 		item.complete();
 	});
