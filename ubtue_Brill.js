@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-01-08 10:06:30"
+	"lastUpdated": "2026-10-13 08:34:06"
 }
 
 /*
@@ -158,14 +158,17 @@ function postProcess(doc, item) {
 	let is_LF = false;
 	let openAccessTag = text(doc, '.has-license span');
 	// mark articles as "LF" (MARC=856 |z|kostenfrei), that are published as open access
-	if (openAccessTag && openAccessTag.match(/open\s+access/gi)) is_LF = true;
+	if (openAccessTag && openAccessTag.match(/open\s+access/gi))
+	    is_LF = true;
+	if (doc.querySelector('[title="Open Access"]'))
+	    is_LF = true;
 	// mark articles as "LF" (MARC=856 |z|kostenfrei), that are free accessible e.g. conference report 10.30965/25890433-04902001
 	let freeAccess = text(doc, '.color-access-free');
 	//if (freeAccess && freeAccess.match(/(free|freier)\s+(access|zugang)/gi)) is_LF = true;
 	// mark free access article as "LF" e.g. https://brill.com/view/journals/jet/35/2/article-p223_6.xml
 	let scriptItems = doc.querySelectorAll('head > script');
 	if (freeAccess && freeAccess.match(/(free|freier)\s+(access|zugang)/gi))
-	is_LF = true;
+	    is_LF = true;
 	else {
 		let scriptItems = doc.querySelectorAll('head > script');
 		for (let i of scriptItems) {
