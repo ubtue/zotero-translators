@@ -2,14 +2,14 @@
 	"translatorID": "88cc789a-bd88-4d40-8caf-4a81138e72c6",
 	"label": "ubtue_Edinburgh University Press Journals",
 	"creator": "Sebastian Karcher",
-	"target": "^https?://www\\.euppublishing\\.com/",
+	"target": "^https?://((www\\.euppublishing\\.com/)|(doi.org/10.3366))",
 	"minVersion": "3.0",
 	"maxVersion": "",
 	"priority": 99,
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-08-05 07:25:05"
+	"lastUpdated": "2026-10-20 15:02:59"
 }
 
 /*
@@ -99,7 +99,7 @@ function scrape(doc, url) {
 			item.abstractNote = ZU.xpathText(doc, '//meta[@name="dc.Description"]/@content');
 			let abstractFromDOM = ZU.xpathText(doc, '//div[contains(@class, "abstractInFull")]//p[not(@class="summary-title")]');
 			if (!abstractFromDOM)
-			    abstractFromDOM =  ZU.xpathText(doc, '//section[@id="abstract"]');
+				abstractFromDOM =  ZU.xpathText(doc, '//section[@id="abstract"]');
 			if (abstractFromDOM && item.abstractNote.length < abstractFromDOM.length)
 				item.abstractNote = abstractFromDOM.replace(/^Abstract/,'').replace(/\w\.,\s/, '.\\n4207 ');
 
@@ -115,6 +115,13 @@ function scrape(doc, url) {
 			for (let creatorTag of ZU.xpath(doc, '//span[@class="contribDegrees"]')) {
 				if (ZU.xpathText(creatorTag, './a[contains(@href, "orcid")]/@href')) {
 						item.notes.push("orcid:" + ZU.xpathText(creatorTag, './a[contains(@href, "orcid")]/@href').replace(/https?:\/\/orcid.org\//, "") + ' | ' + ZU.xpathText(creatorTag, './a[@class="entryAuthor"]'));
+					}
+			}
+
+			for (let creatorTag of ZU.xpath(doc, '//span[@class="authors"]')) {
+				if (ZU.xpath(creatorTag, './/a[@class="orcid-id"]')) {
+						item.notes.push("orcid:" + ZU.xpathText(creatorTag, './/a[@class="orcid-id"]').replace(/https?:\/\/orcid.org\//, "")
+										+ ' | ' + ZU.xpathText(creatorTag, './/span[@property="familyName"]') + ', ' + ZU.xpathText(creatorTag, './/span[@property="givenName"]'));
 					}
 			}
 
