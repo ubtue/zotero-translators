@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-10-20 15:02:59"
+	"lastUpdated": "2026-10-20 15:17:51"
 }
 
 /*
@@ -111,7 +111,10 @@ function scrape(doc, url) {
 
 			if (ZU.xpathText(doc, '//img[contains(@title, "Free Access") or contains(@title, "Open Access")]') !== null) {
 				item.notes.push({'note': 'LF'});
+			} else if (ZU.xpathText(doc, '//i[@class="icon-open_access"]') !== null) {
+				item.notes.push({'note': 'LF'});
 			}
+
 			for (let creatorTag of ZU.xpath(doc, '//span[@class="contribDegrees"]')) {
 				if (ZU.xpathText(creatorTag, './a[contains(@href, "orcid")]/@href')) {
 						item.notes.push("orcid:" + ZU.xpathText(creatorTag, './a[contains(@href, "orcid")]/@href').replace(/https?:\/\/orcid.org\//, "") + ' | ' + ZU.xpathText(creatorTag, './a[@class="entryAuthor"]'));
