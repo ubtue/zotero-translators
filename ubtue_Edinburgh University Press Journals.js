@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-10-20 15:17:51"
+	"lastUpdated": "2026-10-22 09:19:40"
 }
 
 /*
@@ -110,9 +110,9 @@ function scrape(doc, url) {
 				item.tags.push("Book Review");
 
 			if (ZU.xpathText(doc, '//img[contains(@title, "Free Access") or contains(@title, "Open Access")]') !== null) {
-				item.notes.push({'note': 'LF'});
+				item.notes.push({'note': 'LF:'});
 			} else if (ZU.xpathText(doc, '//i[@class="icon-open_access"]') !== null) {
-				item.notes.push({'note': 'LF'});
+				item.notes.push({'note': 'LF:'});
 			}
 
 			for (let creatorTag of ZU.xpath(doc, '//span[@class="contribDegrees"]')) {
@@ -121,7 +121,7 @@ function scrape(doc, url) {
 					}
 			}
 
-			for (let creatorTag of ZU.xpath(doc, '//span[@class="authors"]')) {
+			for (let creatorTag of ZU.xpath(doc, '//span[@property="author" and @role="listitem"]')) {
 				if (ZU.xpath(creatorTag, './/a[@class="orcid-id"]')) {
 						item.notes.push("orcid:" + ZU.xpathText(creatorTag, './/a[@class="orcid-id"]').replace(/https?:\/\/orcid.org\//, "")
 										+ ' | ' + ZU.xpathText(creatorTag, './/span[@property="familyName"]') + ', ' + ZU.xpathText(creatorTag, './/span[@property="givenName"]'));
