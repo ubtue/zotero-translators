@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-06-22 09:00:28"
+	"lastUpdated": "2026-11-03 16:27:40"
 }
 
 /*
@@ -121,11 +121,13 @@ function fixIssue(doc, item) {
 
 
 function fixAuthors(doc, item) {
-	webAuthors = ZU.xpath(doc, '//li[starts-with(@class, "author")]//a | //div[@class="author"]/div/a');
+	webAuthors = ZU.xpath(doc, '//li[starts-with(@class, "author")]//a \
+	                            | //div[@class="author"]/div/a \
+                                    | //div[@class="authors"]');
 	item.creators = [];
 	for (webAuthor of webAuthors) {
-	     if (webAuthor?.textContent.startsWith("("))
-		     continue;
+		 if (webAuthor?.textContent.startsWith("("))
+			 continue;
 		 item.creators.push(ZU.cleanAuthor(webAuthor?.textContent, "author"));
 	}
 	return item.creators;  
