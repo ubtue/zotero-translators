@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-11-09 14:43:40"
+	"lastUpdated": "2026-11-09 14:57:10"
 }
 
 /*
@@ -220,7 +220,7 @@ function finalizeItem(item, doc, doi, baseUrl) {
 	}
 
 	// Insert foreign language abstracts
-	let abstractSectionEntries = ZU.xpath(doc, '//div[contains(@class, "hlFld-Abstract transAbstract")]');
+	let abstractSectionEntries = ZU.xpath(doc, '//div[contains(@class, "hlFld-Abstract transAbstract")]/p');
 	for (let abstractSectionEntry  of abstractSectionEntries) {
 		item.notes.push({note: "abs:" + abstractSectionEntry?.textContent?.trim()});
 	}
