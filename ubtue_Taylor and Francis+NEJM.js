@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-11-09 14:15:50"
+	"lastUpdated": "2026-11-09 14:43:40"
 }
 
 /*
@@ -218,6 +218,13 @@ function finalizeItem(item, doc, doi, baseUrl) {
 	for (let titleSectionEntry of titleSectionEntries) {
 		item.notes.push({note: "additional_title:" + titleSectionEntry?.textContent?.trim()});
 	}
+
+	// Insert foreign language abstracts
+	let abstractSectionEntries = ZU.xpath(doc, '//div[contains(@class, "hlFld-Abstract transAbstract")]');
+	for (let abstractSectionEntry  of abstractSectionEntries) {
+		item.notes.push({note: "abs:" + abstractSectionEntry?.textContent?.trim()});
+	}
+	 
 
 	//deduplicate
 	item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
