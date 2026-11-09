@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2025-03-19 13:51:21"
+	"lastUpdated": "2026-11-09 14:15:50"
 }
 
 /*
@@ -212,6 +212,13 @@ function finalizeItem(item, doc, doi, baseUrl) {
 			item.notes.push({note: "orcid:" + orcid + ' | ' + author});
 		}
 	}
+
+	// Insert foreign language titles
+	let titleSectionEntries = ZU.xpath(doc, '//div[contains(@class, "NLM_trans-title-group")]');
+	for (let titleSectionEntry of titleSectionEntries) {
+		item.notes.push({note: "additional_title:" + titleSectionEntry?.textContent?.trim()});
+	}
+
 	//deduplicate
 	item.notes = Array.from(new Set(item.notes.map(JSON.stringify))).map(JSON.parse);
 
