@@ -9,7 +9,7 @@
 	"inRepository": true,
 	"translatorType": 4,
 	"browserSupport": "gcsibv",
-	"lastUpdated": "2026-02-24 13:02:16"
+	"lastUpdated": "2026-11-23 15:39:18"
 }
 
 /*
@@ -122,6 +122,11 @@ function fixMonthRangeDate(datestring) {
 	return datestring;
 }
 
+function fixDoubeIssueYear(datestring) {
+    doubleIssueYear = /20\d{2}\s*-(20\d{2})/;
+	return datestring?.replace(doubleIssueYear, '$1');
+}
+
 
 function scrape(doc, url) {
 	var item = new Z.Item('journalArticle');
@@ -163,7 +168,7 @@ function scrape(doc, url) {
 	// numbering issues with slash due to cataloguing rule
 	if (item.issue) item.issue = item.issue.replace('-', '/');
 	item.date = ZU.xpathText(doc, '//b[contains(text(), "Date:")]/following-sibling::text()[1]');
-	if (item.date) item.date = fixMonthRangeDate(item.date);
+	if (item.date) item.date = fixDoubeIssueYear(fixMonthRangeDate(item.date));
 	item.pages = ZU.xpathText(doc, '//b[contains(text(), "Pages:")]/following-sibling::text()[1]');
 	item.DOI = ZU.xpathText(doc, '//b[contains(text(), "DOI:")]/following-sibling::text()[1]');
 	item.url = url;
