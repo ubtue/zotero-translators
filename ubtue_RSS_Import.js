@@ -88,7 +88,6 @@ function doImport() {
     var translator = Zotero.loadTranslator("import");
     translator.setTranslator("207ee4d9-6ba4-45c3-b2b8-cdb5f16ef942");
     translator.setString(xml);
-    //translator.getTranslatorObject(function (RSS) {
     translator.setHandler("itemDone", function (t, item) {
         let rssItem = rssItems[index++];
         if (!rssItem) {

@@ -102,7 +102,6 @@ function doImport() {
 	}
 
 	let doc = new DOMParser().parseFromString(xml, "text/xml");
-	//let items = doc.getElementsByTagName("item");
     let items = doc.getElementsByTagName("item").length
             ? doc.getElementsByTagName("item")
             : doc.getElementsByTagName("entry");
@@ -121,7 +120,8 @@ function doImport() {
             text(rssItem, "link"),
             attr(rssItem, "link", "href")
         );
-        item.abstractNote = text(rssItem, "description");
+        let abstractNote = text(rssItem, "description");
+        item.abstractNote = ZU.unescapeHTML(abstractNote);
         item.date = first(
             text(rssItem, "pubDate"),
             dcText(rssItem, "date"),
@@ -151,12 +151,10 @@ function doImport() {
         if (itunes_author) {
            item.creators = [];
            addAuthors(item, itunes_author);
-           item.type = 'podcast';
+           item.itemType = 'podcast';
         }
-        //let podcast_duration = text(rssItem, "itunes:duration")
-        //if (podcast_duration) item.notes.push("podcast duration:" + podcast_duration);
-        //let guid = text(rssItem, "guid");
-        //if (guid) item.notes.push("guid: " + guid);
+        let video_id = text(rssItem, "yt:videoId");
+        if (video_id) item.itemType = 'videoRecording';
 
         item.complete();
     }
